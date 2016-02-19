@@ -13,5 +13,6 @@ Start the Habitat Blueprint Browser.
 \dontrun{
   HabitatBrowser()
 }
+
 }
 

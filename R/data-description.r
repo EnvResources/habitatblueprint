@@ -6,16 +6,17 @@
 #' @name habitatblueprint-package
 #' @docType package
 #'
-#' @importFrom dplyr filter
+#' @importFrom scales date_trans
+#' @importFrom RColorBrewer brewer.pal
 #' @importFrom dplyr arrange
-#' @importFrom dplyr summarize
+#' @importFrom dplyr filter
 #' @importFrom dplyr group_by
 #' @importFrom dplyr left_join
+#' @importFrom dplyr summarize
+#' @importFrom shiny runApp
 #' @importFrom tidyr gather_
 #' @importFrom tidyr spread_
-#' @importFrom RColorBrewer brewer.pal
 #' @import ggplot2
-#' @importFrom shiny runApp
 NULL
 
 #' CTD Transect Meta Data
@@ -199,6 +200,8 @@ NULL
 #' \dontrun{
 #'   HabitatBrowser()
 #' }
+#'
+#' @importFrom shiny runApp
 #' @export
 HabitatBrowser = function(){
   runApp(system.file("shiny/", package = "habitatblueprint", mustWork = TRUE))

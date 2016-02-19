@@ -240,7 +240,7 @@ shinyServer(function(input, output){
     hablevels = levels(periodgrids()$habitat)
     overall = summarize(group_by(periodgrids(), date, id, 
       habitat, code, days.since.closure), 
-      volume = sum(volume)))
+      volume = sum(volume))
     ovlevels = as.character(unique(overall$habitat))
     overall.spread = spread_(overall, "habitat", "volume", fill = 0)
     overall.spread["total.volume"] = rowSums(overall.spread[ovlevels])
@@ -281,7 +281,7 @@ shinyServer(function(input, output){
     hablevels = levels(periodgrids()$habitat)
     bydepth = summarize(group_by(periodgrids(), date, id, 
       habitat, depth.zone, code, days.since.closure), 
-      volume = sum(volume)))
+      volume = sum(volume))
     ovlevels = as.character(unique(bydepth$habitat))
     bydepth.spread = spread_(bydepth, "habitat", "volume", fill = 0)
     bydepth.spread["total.volume"] = rowSums(bydepth.spread[ovlevels])
