@@ -1,9 +1,10 @@
+data(ctdmeta)
+data(habgrids)
+data(inflows)
+data(tides)
+data(wll)
+
 shinyServer(function(input, output){
-  data(ctdmeta)
-  data(habgrids)
-  data(inflows)
-  data(tides)
-  data(wll)
 
 ########## Explore Transect ###################################################  
 
@@ -92,8 +93,8 @@ shinyServer(function(input, output){
     "induced ion exporting", "ion neutral", "ion importing"))
   oa.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", "limited", 
     "suitable", "no impairment"))
-  depth.colors = setNames(brewer.pal(4, "BuPu"), c("littoral", 
-    "surface limnetic", "subsurface limnetic", "profundal") 
+  depth.colors = setNames(brewer.pal(5, "BuPu"), c("littoral",
+    "surface limnetic", "epibenthic", "subsurface limnetic", "profundal")
 )
 
   # plot the main grid
@@ -108,7 +109,7 @@ shinyServer(function(input, output){
   
   # plot the categories
   catdata = reactive(summarize(group_by(griddata(), habitat), 
-    volume = sum(volume)))
+    volume = sum(volume.total)))
   cat.settings = list(
     scale_y_continuous("total volume (m3)", labels = comma),
     theme(axis.text.x = element_blank(), axis.title.x = element_blank(), 
@@ -124,8 +125,20 @@ shinyServer(function(input, output){
   })
 
   # plot by depth
-  depthdata = reactive(summarize(group_by(griddata(), depth.zone, habitat), 
-    volume = sum(volume)))
+  depthdata = reactive({
+    depthdata = summarize(group_by(gather(griddata(), depth.zone, 
+      volume, volume.littoral, volume.limnetic, volume.epibenthic, 
+      volume.sublimnetic, volume.profundal), depth.zone, habitat), 
+      volume = sum(volume))
+    depthdata["depth.zone"] = factor(depthdata$depth.zone, 
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))
+    depthdata
+  })
+      
+  
 #  depth.plot = reactive(ggplot(griddata(), aes(x = dist, y = elev, 
 #      fill = depth.qual)) + geom_raster() + 
 #      plot.settings + scale_fill_manual("", values = depth.colors) + 
@@ -147,29 +160,29 @@ shinyServer(function(input, output){
   })
   
   # overall volume
-#  depthvoldata = reactive(gather(summarize(group_by(griddata(), habitat), 
-#    volume.total = sum(volume.total), volume.littoral = sum(volume.littoral),
-#    volume.surface = sum(volume.surface), 
-#    volume.subsurface = sum(volume.subsurface),
-#    volume.profundal = sum(volume.profundal)
-#  )), depth.cat, volume, -habitat)
-#  vol.depth = reactive(ggplot(depthvoldata(), aes(x = depth.cat, y = volume, 
-#    fill = depth.cat)) + geom_bar(stat = "identity", position = "stack") + 
-#    scale_fill_manual("depth category", values = depth.colors, 
-#      drop = FALSE) + cat.settings + theme(legend.position = "none") 
-#  )
-#  output$depth_vol = renderPlot({
-#    vol.depth()
-#  })
-#  hab.depth.cat = reactive(ggplot(depthvoldata(), aes(x = habitat, y = volume, 
-#    fill = habitat)) + geom_bar(stat = "identity", position = "stack") + 
-#    scale_fill_manual("depth category", values = depth.colors, 
-#      drop = FALSE) + cat.settings + theme(legend.position = "none") + 
-#    facet_wrap(~ depth.cat, nrow = 1)
-#  )
-#  output$depth_cat_hab = renderPlot({
-#    hab.depth.cat()
-#  })
+  depthvoldata = reactive({
+    depthvoldata = gather(summarize(group_by(griddata(), habitat), 
+      volume.littoral = sum(volume.littoral),
+      volume.limnetic = sum(volume.limnetic), 
+      volume.epibenthic = sum(volume.epibenthic),
+      volume.sublimnetic = sum(volume.sublimnetic),
+      volume.profundal = sum(volume.profundal)
+      ), depth.cat, volume, -habitat)
+  depthvoldata["depth.cat"] = factor(depthvoldata$depth.cat, 
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))
+  depthvoldata
+  })
+  vol.depth = reactive(ggplot(depthvoldata(), aes(x = depth.cat, y = volume, 
+    fill = depth.cat)) + geom_bar(stat = "identity", position = "stack") + 
+    scale_fill_manual("depth category", values = depth.colors, 
+      drop = FALSE) + cat.settings #+ theme(legend.position = "none") 
+  )
+  output$depth_vol = renderPlot({
+    vol.depth()
+  })
   
   
 ########### Explore Periods ###################################################
@@ -240,7 +253,7 @@ shinyServer(function(input, output){
     hablevels = levels(periodgrids()$habitat)
     overall = summarize(group_by(periodgrids(), date, id, 
       habitat, code, days.since.closure), 
-      volume = sum(volume))
+      volume = sum(volume.total))
     ovlevels = as.character(unique(overall$habitat))
     overall.spread = spread_(overall, "habitat", "volume", fill = 0)
     overall.spread["total.volume"] = rowSums(overall.spread[ovlevels])
@@ -263,7 +276,7 @@ shinyServer(function(input, output){
         aes(x = datetime, y = volume, fill = habitat)) + 
         geom_area(position = "stack") + scale_x_datetime("") +
         scale_fill_manual("", values = habitat.colors) +
-        theme(legend.position = "none") +
+        theme(legend.position = "left") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         region.setting()
     } else{
@@ -271,7 +284,7 @@ shinyServer(function(input, output){
         aes(x = factor(datetime), y = volume, fill = habitat)) + xlab("") +
         geom_bar(stat = "identity", position = "stack") +
         scale_fill_manual("", values = habitat.colors, drop = FALSE) +
-        theme(legend.position = "none") +
+        theme(legend.position = "left") +
         scale_y_continuous(name="Volume (m3)", labels = comma)    
     }
   })
@@ -279,7 +292,9 @@ shinyServer(function(input, output){
   # stratified habitat plots
   bydepth.gathered = reactive({
     hablevels = levels(periodgrids()$habitat)
-    bydepth = summarize(group_by(periodgrids(), date, id, 
+    bydepth = summarize(group_by(gather(periodgrids(), depth.zone, 
+      volume, volume.littoral, volume.limnetic, volume.epibenthic, 
+      volume.sublimnetic, volume.profundal), date, id, 
       habitat, depth.zone, code, days.since.closure), 
       volume = sum(volume))
     ovlevels = as.character(unique(bydepth$habitat))
@@ -296,6 +311,11 @@ shinyServer(function(input, output){
     bydepth.gathered = left_join(bydepth.gathered,
       data.frame(date = as.Date(perioddate()), id = periodid(), 
         datetime = periodtime()), by = c("date", "id"))
+    bydepth.gathered["depth.zone"] = factor(bydepth.gathered$depth.zone, 
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))
     bydepth.gathered
   })
   output$period_bydepth = renderPlot({
@@ -304,15 +324,15 @@ shinyServer(function(input, output){
         aes(x = datetime, y = volume, fill = habitat)) + 
         geom_area(position = "stack") + scale_x_datetime("") +
         scale_fill_manual("", values = habitat.colors, drop = FALSE) +
-        theme(legend.position = "left") +
+        theme(legend.position = "none") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
-        region.setting() + facet_wrap(~ depth.zone, ncol = 1)
+        region.setting() + facet_wrap(~ depth.zone, ncol = 1, scales = "free_y")
     } else{
       ggplot(arrange(bydepth.gathered(), -as.numeric(habitat)), 
         aes(x = factor(datetime), y = volume, fill = habitat)) + xlab("") +
         geom_bar(stat = "identity", position = "stack") +
         scale_fill_manual("", values = habitat.colors, drop = FALSE) +
-        theme(legend.position = "left") +
+        theme(legend.position = "none") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         facet_wrap(~ depth.zone, ncol = 1)
     }

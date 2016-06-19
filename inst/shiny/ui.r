@@ -35,19 +35,15 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
             plotOutput("category_bar")
           ),
           column(6,
-            plotOutput("depth_cat")
+            plotOutput("depth_vol")
           )
-        )#,
-#        h1("Depth Habitat"),
-#        fluidRow(
-#          column(6,
-#            plotOutput("depth_plot")
-#          ),
-#          column(6,
-#            plotOutput("depth_vol")
-#          )
-#        ),
-#        plotOutput("depth_cat_hab")
+        ),
+        fluidRow(
+          column(11,
+            plotOutput("depth_cat")
+          ),
+          column(1)
+        )
       )
     )
   ),
@@ -65,7 +61,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
       mainPanel(
         h1("Overall Habitat"),
         plotOutput("period_overall"),
-        plotOutput("period_bydepth")
+        plotOutput("period_bydepth", height = "1200px")
       )
     )
   )
