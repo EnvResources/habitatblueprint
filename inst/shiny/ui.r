@@ -2,21 +2,21 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
   # explanation of project and interface
   tabPanel("Description",
     tabsetPanel("stuff",
-    tabPanel("welcome",
-      includeMarkdown("welcome.md")
-    ),
-    tabPanel("available data",
-      includeMarkdown("data.md")
-    ),
-    tabPanel("habitat definitions",
-      withMathJax(),
-      includeCSS("table.css"),
-      includeMarkdown("habitat.md")
-    ),
-    tabPanel("technical details",
-      includeMarkdown("technical.md")
+      tabPanel("welcome",
+        includeMarkdown("welcome.md")
+      ),
+      tabPanel("available data",
+        includeMarkdown("data.md")
+      ),
+      tabPanel("habitat definitions",
+        withMathJax(),
+        includeCSS("table.css"),
+        includeMarkdown("habitat.md")
+      ),
+      tabPanel("technical details",
+        includeMarkdown("technical.md")
+      )
     )
-  )
   ),
   # explore single transect
   tabPanel("Explore Transect",
@@ -28,7 +28,12 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
         plotOutput("transect_wll")
       ),
       mainPanel(
-        h1("Overall Habitat"),
+        h3(selectInput("habitat_type", NULL, 
+            choices = c("Overall Habitat" = "habitat", 
+              "Temperature Habitat" = "ta.qual", 
+              "Salinity Habitat"  = "sa.qual", 
+              "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")
+        ),
         plotOutput("grid_plot"),
         fluidRow(
           column(6, 
@@ -59,7 +64,11 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
         plotOutput("period_wll")
       ),
       mainPanel(
-        h1("Overall Habitat"),
+        h3(selectInput("period_habitat_type", NULL, 
+            choices = c("Overall Habitat" = "habitat", 
+              "Temperature Habitat" = "ta.qual", 
+              "Salinity Habitat"  = "sa.qual", 
+              "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")),
         plotOutput("period_overall"),
         plotOutput("period_bydepth", height = "1200px")
       )

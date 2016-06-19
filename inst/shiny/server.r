@@ -5,6 +5,7 @@ data(tides)
 data(wll)
 
 shinyServer(function(input, output){
+Sys.setenv(TZ = 'UTC')
 
 ########## Explore Transect ###################################################  
 
@@ -14,13 +15,13 @@ shinyServer(function(input, output){
   output$transect_date = renderUI({
     selectInput("transect_date", "Select transect", size = 10, selected = 1, 
       selectize = FALSE, choices = setNames(seq(nrow(ctdmeta)), 
-        paste(strftime(ctdmeta$start, "%Y-%m-%d"), 
-          paste0(strftime(ctdmeta$start, "%H:%M"), "--",  
-            strftime(ctdmeta$end, "%H:%M")), 
+        paste(strftime(ctdmeta$start, "%Y-%m-%d", tz = "UTC"), 
+          paste0(strftime(ctdmeta$start, "%H:%M", tz = "UTC"), "--",  
+            strftime(ctdmeta$end, "%H:%M", tz = "UTC")), 
           paste0("(", ctdmeta$code,")")))
     )
   })
-  
+
  # prep for flow/tide/wll plots
   intervalstart = reactive(ctdmeta[input$transect_date, "start"] - 3.5*86400)
   intervalend = reactive(ctdmeta[input$transect_date, "start"] + 3.5*86400)
@@ -60,10 +61,10 @@ shinyServer(function(input, output){
 
   # get the grid for selected transect
   transectdate = reactive(strftime(ctdmeta[input$transect_date, "start"], 
-    "%Y-%m-%d"))
+    "%Y-%m-%d", tz = "UTC"))
   transectid = reactive(ctdmeta[input$transect_date, "id"])
-  griddata = reactive(filter(habgrids, date == transectdate(), 
-    id == transectid()))
+  griddata = reactive(mutate_(filter(habgrids, date == transectdate(), 
+    id == transectid()), habitat = input$habitat_type))
 
   # plot settings
   plot.settings = list(
@@ -72,7 +73,7 @@ shinyServer(function(input, output){
     ylab("elevation above NAVD29 (m)"),
     xlab("distance from river mouth (m)")
   )
-  habitat.colors = c(
+  overall.colors = c(
     "optimal" = "#1f78b4",
     "sub-optimal (T)" = "#a6cee3",
     "sub-optimal (DO)" = "#33a02c",
@@ -89,18 +90,26 @@ shinyServer(function(input, output){
   )
   ta.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", 
     "stressful", "suitable", "optimal"))
-  sa.colors = setNames(brewer.pal(4, "RdYlGn"), c("ion.exporting", 
+  sa.colors = setNames(brewer.pal(4, "RdYlGn"), c("ion exporting", 
     "induced ion exporting", "ion neutral", "ion importing"))
   oa.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", "limited", 
     "suitable", "no impairment"))
   depth.colors = setNames(brewer.pal(5, "BuPu"), c("littoral",
     "surface limnetic", "epibenthic", "subsurface limnetic", "profundal")
 )
-
+  habitat.colors = reactive({
+    switch(input$habitat_type, 
+      "habitat" = overall.colors,
+      "ta.qual" = ta.colors,
+      "sa.qual" = sa.colors,
+      "oa.qual" = oa.colors
+    )
+  })
+  
   # plot the main grid
   habitat.plot = reactive(ggplot(griddata(), aes(x = dist, y = elev, 
       fill = habitat)) + geom_raster() + 
-      plot.settings + scale_fill_manual("", values = habitat.colors) + 
+      plot.settings + scale_fill_manual("", values = habitat.colors()) + 
       theme(legend.position = "none")  
   )
   output$grid_plot = renderPlot({
@@ -117,7 +126,7 @@ shinyServer(function(input, output){
   )
   cat.plot = reactive(ggplot(catdata(), aes(x = habitat, y = volume, 
     fill = habitat)) + geom_bar(stat = "identity") + 
-    scale_fill_manual("overall habitat quality", values = habitat.colors, 
+    scale_fill_manual("overall habitat quality", values = habitat.colors(), 
       drop = FALSE) + cat.settings + theme(legend.position = "left")
   )
   output$category_bar = renderPlot({
@@ -138,19 +147,10 @@ shinyServer(function(input, output){
     depthdata
   })
       
-  
-#  depth.plot = reactive(ggplot(griddata(), aes(x = dist, y = elev, 
-#      fill = depth.qual)) + geom_raster() + 
-#      plot.settings + scale_fill_manual("", values = depth.colors) + 
-#      theme(legend.position = "bottom")  
-#  )
-#  output$depth_plot = renderPlot({
-#    depth.plot()
-#  })
 
   cat.depth = reactive(ggplot(depthdata(), aes(x = habitat, y = volume, 
     fill = habitat)) + geom_bar(stat = "identity") + 
-    scale_fill_manual("overall habitat quality", values = habitat.colors, 
+    scale_fill_manual("overall habitat quality", values = habitat.colors(), 
       drop = FALSE) + cat.settings + theme(legend.position = "none") + 
     facet_wrap(~ depth.zone) + theme(axis.title.y = element_blank())
   )
@@ -192,9 +192,9 @@ shinyServer(function(input, output){
   output$period = renderUI({
     selectInput("period_date", "Select transects", size = 10, selected = c(1,2), 
       multiple = TRUE, selectize = FALSE, choices = setNames(seq(nrow(ctdmeta)), 
-        paste(strftime(ctdmeta$start, "%Y-%m-%d"), 
-          paste0(strftime(ctdmeta$start, "%H:%M"), "--",  
-            strftime(ctdmeta$end, "%H:%M")), 
+        paste(strftime(ctdmeta$start, "%Y-%m-%d", tz = "UTC"), 
+          paste0(strftime(ctdmeta$start, "%H:%M", tz = "UTC"), "--",  
+            strftime(ctdmeta$end, "%H:%M", tz = "UTC")), 
           paste0("(", ctdmeta$code,")")))
     )
   })
@@ -242,12 +242,21 @@ shinyServer(function(input, output){
 
   # get the grid for selected period
   perioddate = reactive(strftime(ctdmeta[periodrange(), "start"], 
-    "%Y-%m-%d"))
+    "%Y-%m-%d", tz = "UTC"))
   periodtime = reactive(ctdmeta[periodrange(), "start"])
   periodid = reactive(ctdmeta[periodrange(), "id"])
-  periodgrids = reactive(filter(habgrids, date %in% as.Date(perioddate()), 
-    id %in% periodid()))
-  
+  periodgrids = reactive(mutate_(filter(habgrids, date %in% as.Date(perioddate()), 
+    id %in% periodid()), habitat = input$period_habitat_type))
+
+    period.habitat.colors = reactive({
+    switch(input$period_habitat_type, 
+      "habitat" = overall.colors,
+      "ta.qual" = ta.colors,
+      "sa.qual" = sa.colors,
+      "oa.qual" = oa.colors
+    )
+  })
+    
   # overall habitat plots
   overall.gathered = reactive({
     hablevels = levels(periodgrids()$habitat)
@@ -275,7 +284,7 @@ shinyServer(function(input, output){
       ggplot(arrange(overall.gathered(), -as.numeric(habitat)), 
         aes(x = datetime, y = volume, fill = habitat)) + 
         geom_area(position = "stack") + scale_x_datetime("") +
-        scale_fill_manual("", values = habitat.colors) +
+        scale_fill_manual("", values = period.habitat.colors()) +
         theme(legend.position = "left") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         region.setting()
@@ -283,7 +292,7 @@ shinyServer(function(input, output){
       ggplot(arrange(overall.gathered(), -as.numeric(habitat)), 
         aes(x = factor(datetime), y = volume, fill = habitat)) + xlab("") +
         geom_bar(stat = "identity", position = "stack") +
-        scale_fill_manual("", values = habitat.colors, drop = FALSE) +
+        scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "left") +
         scale_y_continuous(name="Volume (m3)", labels = comma)    
     }
@@ -323,7 +332,7 @@ shinyServer(function(input, output){
       ggplot(arrange(bydepth.gathered(), -as.numeric(habitat)), 
         aes(x = datetime, y = volume, fill = habitat)) + 
         geom_area(position = "stack") + scale_x_datetime("") +
-        scale_fill_manual("", values = habitat.colors, drop = FALSE) +
+        scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "none") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         region.setting() + facet_wrap(~ depth.zone, ncol = 1, scales = "free_y")
@@ -331,7 +340,7 @@ shinyServer(function(input, output){
       ggplot(arrange(bydepth.gathered(), -as.numeric(habitat)), 
         aes(x = factor(datetime), y = volume, fill = habitat)) + xlab("") +
         geom_bar(stat = "identity", position = "stack") +
-        scale_fill_manual("", values = habitat.colors, drop = FALSE) +
+        scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "none") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         facet_wrap(~ depth.zone, ncol = 1)
