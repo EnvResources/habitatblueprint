@@ -70,6 +70,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
               "Salinity Habitat"  = "sa.qual", 
               "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")),
         plotOutput("period_overall"),
+        plotOutput("period_alldepth"),
         plotOutput("period_bydepth", height = "1200px")
       )
     )

@@ -291,7 +291,7 @@ shinyServer(function(input, output){
         geom_area(position = "stack") + scale_x_datetime("") +
         scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "left") +
-        scale_y_continuous(name="Volume (m3)", labels = comma) + 
+        scale_y_continuous(name = "Volume (m3)", labels = comma) + 
         region.setting()
     } else{
       ggplot(arrange(overall.gathered(), -as.numeric(habitat)), 
@@ -299,7 +299,46 @@ shinyServer(function(input, output){
         geom_bar(stat = "identity", position = "stack") +
         scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "left") +
-        scale_y_continuous(name="Volume (m3)", labels = comma)    
+        scale_y_continuous(name = "Volume (m3)", labels = comma)    
+    }
+  })
+  
+  # depth plots
+  alldepth = reactive({
+    alldepth = summarize(group_by(gather(periodgrids(), depth.zone, 
+      volume, volume.littoral, volume.limnetic, volume.epibenthic, 
+      volume.sublimnetic, volume.profundal), date, id, 
+      depth.zone, code, days.since.closure), 
+      volume = sum(volume))
+    alldepth["depth.zone"] = factor(alldepth$depth.zone, ordered = TRUE,
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))    
+    alldepth = left_join(alldepth, 
+      unique(periodgrids()[c("date", "id", "wse")]), by = c("date", "id"))
+    alldepth = left_join(alldepth,
+      data.frame(date = as.Date(perioddate()), id = periodid(), 
+        datetime = periodtime()), by = c("date", "id"))
+    alldepth
+  })
+  
+  output$period_alldepth = renderPlot({
+    if(input$plot_type == "stacked area"){
+      ggplot(arrange(alldepth(), -as.numeric(depth.zone)), 
+        aes(x = datetime, y = volume, fill = depth.zone)) + 
+        geom_area(position = "stack") + scale_x_datetime("") +
+        scale_fill_manual("", values = depth.colors, drop = FALSE) +
+        theme(legend.position = "left") +
+        scale_y_continuous(name = "Volume (m3)", labels = comma) + 
+        region.setting()
+    } else{
+      ggplot(arrange(alldepth(), -as.numeric(depth.zone)), 
+        aes(x = factor(datetime), y = volume, fill = depth.zone)) + xlab("") +
+        geom_bar(stat = "identity", position = "stack") +
+        scale_fill_manual("", values = depth.colors, drop = FALSE) +
+        theme(legend.position = "left") +
+        scale_y_continuous(name = "Volume (m3)", labels = comma)    
     }
   })
   
