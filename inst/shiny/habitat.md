@@ -53,6 +53,6 @@ water depth.
 |:--------------------------|:----------------------------------------------------------------------------------|:---------------------------------------------------------------|
 | Littoral (Shallow/shoal)  | High prey availability, high avian predation risk, low aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} < 1\text{m}$            |
 | Surface Limnetic          | Low prey availability, high avian predation risk, high aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} \geq 1\text{m}$         |
-| Epibenthic                | High prey availability, low avian predation risk, moderate aquatic predation risk | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{depth} \leq 5$ |
-| Subsurface Limnetic       | Low prey availability, low avian predation risk, moderate aquatic predation risk  | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{depth} > 5$    |
+| Epibenthic                | High prey availability, low avian predation risk, moderate aquatic predation risk | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} \leq 5$ |
+| Subsurface Limnetic       | Low prey availability, low avian predation risk, moderate aquatic predation risk  | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} > 5$    |
 | Profundal                 | Low prey availability, no predation risk                                         | $depth > 5\text{m}$                                            |
