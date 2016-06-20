@@ -5,7 +5,12 @@ data(tides)
 data(wll)
 
 shinyServer(function(input, output){
-Sys.setenv(TZ = 'UTC')
+  Sys.setenv(TZ = 'UTC')
+
+  observe({
+    if(input$navbar == "stop")
+      stopApp()
+  })
 
 ########## Explore Transect ###################################################  
 

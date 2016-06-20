@@ -1,6 +1,6 @@
-shinyUI(navbarPage("Habitat Blueprint Browser",
+shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
   # explanation of project and interface
-  tabPanel("Description",
+  tabPanel("Description", value = "info",
     tabsetPanel("stuff",
       tabPanel("welcome",
         includeMarkdown("welcome.md")
@@ -19,7 +19,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
     )
   ),
   # explore single transect
-  tabPanel("Explore Transect",
+  tabPanel("Explore Transect", value = "transect",
     sidebarLayout(
       sidebarPanel(
         uiOutput("transect_date"),
@@ -53,7 +53,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
     )
   ),
   # explore period (e.g. single closure
-  tabPanel("Explore Period",
+  tabPanel("Explore Period", value = "period",
     sidebarLayout(
       sidebarPanel(
         uiOutput("period"),
@@ -73,5 +73,6 @@ shinyUI(navbarPage("Habitat Blueprint Browser",
         plotOutput("period_bydepth", height = "1200px")
       )
     )
-  )
+  ),
+  tabPanel("Quit", value = "stop")
 ))
