@@ -289,7 +289,7 @@ shinyServer(function(input, output){
       ggplot(arrange(overall.gathered(), -as.numeric(habitat)), 
         aes(x = datetime, y = volume, fill = habitat)) + 
         geom_area(position = "stack") + scale_x_datetime("") +
-        scale_fill_manual("", values = period.habitat.colors()) +
+        scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "left") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
         region.setting()
@@ -348,7 +348,7 @@ shinyServer(function(input, output){
         scale_fill_manual("", values = period.habitat.colors(), drop = FALSE) +
         theme(legend.position = "none") +
         scale_y_continuous(name="Volume (m3)", labels = comma) + 
-        facet_wrap(~ depth.zone, ncol = 1)
+        facet_wrap(~ depth.zone, ncol = 1, scales = "free_y")
     }
   })
 })
