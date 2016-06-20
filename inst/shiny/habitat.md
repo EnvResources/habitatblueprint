@@ -49,9 +49,10 @@ Quality Parameter and Habitat Productivity Technical Group has additionally
 defined a separate set of habitat categories that assess habitat in terms of 
 water depth.
 
-| Category                  | Description                                                                                                   | Criteria                               |
-|:--------------------------|:--------------------------------------------------------------------------------------------------------------|:---------------------------------------|
-| Shallow/shoal (Littoral)  | high prey availability; high avian predation risk                                                             | $depth < 2\text{m}$ and $\max{(depth)} < 2\text{m}$    |
-| Surface (Limnetic)        | lower prey availability; high avian predation risk                                                            | $depth < 2\text{m}$ and $\max{(depth)} \geq 2\text{m}$ |
-| Subsurface (Limnetic)     | high prey availability where sediment $< 5\text{m}$; low prey availability where depth $>5\text{m}$); lower avian predation risk | $2\text{m} \leq depth \leq 5\text{m}$                   |
-| Stagnant (Profundal) zone | unsuitable due to hypoxia/anoxia; low avian predation risk                                                    | $depth > 5\text{m}$                        |
+| Category                  | Description                                                                       | Criteria                                                       |
+|:--------------------------|:----------------------------------------------------------------------------------|:---------------------------------------------------------------|
+| Littoral (Shallow/shoal)  | High prey availability, high avian predation risk, low aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} < 1\text{m}$            |
+| Surface Limnetic          | Low prey availability, high avian predation risk, high aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} \geq 1\text{m}$         |
+| Epibenthic                | High prey availability, low avian predation risk, moderate aquatic predation risk | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{depth} \leq 5$ |
+| Subsurface Limnetic       | Low prey availability, low avian predation risk, moderate aquatic predation risk  | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{depth} > 5$    |
+| Profundal                 | Low prey availability, no predation risk                                         | $depth > 5\text{m}$                                            |
