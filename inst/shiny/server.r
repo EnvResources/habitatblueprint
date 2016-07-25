@@ -5,7 +5,6 @@ data(tides)
 data(wll)
 
 shinyServer(function(input, output){
-  Sys.setenv(TZ = 'UTC')
 
   observe({
     if(input$navbar == "stop")
@@ -20,9 +19,9 @@ shinyServer(function(input, output){
   output$transect_date = renderUI({
     selectInput("transect_date", "Select transect", size = 10, selected = 1, 
       selectize = FALSE, choices = setNames(seq(nrow(ctdmeta)), 
-        paste(strftime(ctdmeta$start, "%Y-%m-%d", tz = "UTC"), 
-          paste0(strftime(ctdmeta$start, "%H:%M", tz = "UTC"), "--",  
-            strftime(ctdmeta$end, "%H:%M", tz = "UTC")), 
+        paste(strftime(ctdmeta$start, "%Y-%m-%d"), 
+          paste0(strftime(ctdmeta$start, "%H:%M"), "--",  
+            strftime(ctdmeta$end, "%H:%M")), 
           paste0("(", ctdmeta$code,")")))
     )
   })
@@ -66,7 +65,7 @@ shinyServer(function(input, output){
 
   # get the grid for selected transect
   transectdate = reactive(strftime(ctdmeta[input$transect_date, "start"], 
-    "%Y-%m-%d", tz = "UTC"))
+    "%Y-%m-%d", tz = "US/Pacific"))
   transectid = reactive(ctdmeta[input$transect_date, "id"])
   griddata = reactive(mutate_(filter(habgrids, date == transectdate(), 
     id == transectid()), habitat = input$habitat_type))
@@ -197,9 +196,9 @@ shinyServer(function(input, output){
   output$period = renderUI({
     selectInput("period_date", "Select transects", size = 10, selected = c(1,2), 
       multiple = TRUE, selectize = FALSE, choices = setNames(seq(nrow(ctdmeta)), 
-        paste(strftime(ctdmeta$start, "%Y-%m-%d", tz = "UTC"), 
-          paste0(strftime(ctdmeta$start, "%H:%M", tz = "UTC"), "--",  
-            strftime(ctdmeta$end, "%H:%M", tz = "UTC")), 
+        paste(strftime(ctdmeta$start, "%Y-%m-%d"), 
+          paste0(strftime(ctdmeta$start, "%H:%M"), "--",  
+            strftime(ctdmeta$end, "%H:%M")), 
           paste0("(", ctdmeta$code,")")))
     )
   })
@@ -247,7 +246,7 @@ shinyServer(function(input, output){
 
   # get the grid for selected period
   perioddate = reactive(strftime(ctdmeta[periodrange(), "start"], 
-    "%Y-%m-%d", tz = "UTC"))
+    "%Y-%m-%d", tz = "US/Pacific"))
   periodtime = reactive(ctdmeta[periodrange(), "start"])
   periodid = reactive(ctdmeta[periodrange(), "id"])
   periodgrids = reactive(mutate_(filter(habgrids, date %in% as.Date(perioddate()), 
