@@ -2,13 +2,11 @@ data(ctdmeta)
 data(inflows)
 data(tides)
 data(wll)
-shinyServer(function(input, output, session){
 data(habgrids)
-attr(habgrids, "wasmodded") = 0
 
-habgrids.poll = reactivePoll(500, session, 
-  function() attr(habgrids, "wasmodded"), 
-  function() habgrids )
+shinyServer(function(input, output, session){
+
+reactivehab = reactiveValues(grid = habgrids)
   
   observe({
     if(input$navbar == "stop")
@@ -71,7 +69,7 @@ habgrids.poll = reactivePoll(500, session,
   transectdate = reactive(strftime(ctdmeta[input$transect_date, "start"], 
     "%Y-%m-%d", tz = "US/Pacific"))
   transectid = reactive(ctdmeta[input$transect_date, "id"])
-  griddata = reactive(mutate_(filter(habgrids.poll(), date == transectdate(), 
+  griddata = reactive(mutate_(filter(reactivehab$grid, date == transectdate(), 
     id == transectid()), habitat = input$habitat_type))
 
   # plot settings
@@ -115,11 +113,11 @@ habgrids.poll = reactivePoll(500, session,
         values = sa.colors, drop = FALSE),
       "oa.qual" = scale_fill_manual("Dissolved oxygen quality", 
         values = oa.colors, drop = FALSE),
-      "ta" = scale_fill_distiller("Temperature", type = "div", 
+      "ta" = scale_fill_distiller("Temperature\n", type = "div", 
         palette = "RdYlBu", guide = "colourbar"),
-      "sa" = scale_fill_distiller("Salinity", type = "div", 
+      "sa" = scale_fill_distiller("Salinity\n", type = "div", 
         palette = "PRGn", guide = "colourbar"),
-      "oa" = scale_fill_distiller("Dissolved Oxygen", type = "div", 
+      "oa" = scale_fill_distiller("Dissolved Oxygen\n", type = "div", 
         palette = "RdYlGn", guide = "colourbar", direction = -1)
     )
   })
@@ -261,7 +259,7 @@ habgrids.poll = reactivePoll(500, session,
     "%Y-%m-%d", tz = "US/Pacific"))
   periodtime = reactive(ctdmeta[periodrange(), "start"])
   periodid = reactive(ctdmeta[periodrange(), "id"])
-  periodgrids = reactive(mutate_(filter(habgrids.poll(), date %in% as.Date(perioddate()), 
+  periodgrids = reactive(mutate_(filter(reactivehab$grid, date %in% as.Date(perioddate()), 
     id %in% periodid()), habitat = input$period_habitat_type))
 
     period.habitat.colors = reactive({
@@ -419,7 +417,7 @@ habgrids.poll = reactivePoll(500, session,
   perturbdate = reactive(strftime(ctdmeta[input$perturb_date, "start"], 
     "%Y-%m-%d", tz = "US/Pacific"))
   perturbid = reactive(ctdmeta[input$perturb_date, "id"])
-  perturbdata = reactive(mutate_(filter(habgrids.poll(), date == perturbdate(), 
+  perturbdata = reactive(mutate_(filter(reactivehab$grid, date == perturbdate(), 
     id == perturbid()), habitat = input$perturb_var))
 
   perturb.habitat.colors = reactive({
@@ -442,15 +440,19 @@ habgrids.poll = reactivePoll(500, session,
   })
 
   observeEvent(input$perturb_action, {
-    perturbmask = (habgrids$date == perturbdate()) & 
-      (habgrids$id == perturbid())
-    habgrids[perturbmask, input$perturb_var] = habgrids[[input$perturb_var]][perturbmask] + input$perturb_val
-    attr(habgrids, "wasmodded") = attr(habgrids, "wasmodded") + 1
+    perturbmask = (reactivehab$grid$date == perturbdate()) & (reactivehab$grid$id == perturbid())
+    reactivehab$grid[perturbmask, input$perturb_var] = reactivehab$grid[[input$perturb_var]][perturbmask] + input$perturb_val
+    classfun = switch(input$perturb_var, 
+      sa = habitatblueprint:::classify_sa, 
+      ta = habitatblueprint:::classify_ta, 
+      oa = habitatblueprint:::classify_oa)
+    reactivehab$grid[perturbmask, paste0(input$perturb_var, ".qual")] = classfun(reactivehab$grid[[input$perturb_var]][perturbmask])
+    reactivehab$grid[perturbmask, "habitat"] = habitatblueprint:::classify_overall(reactivehab$grid$ta.qual[perturbmask], 
+      reactivehab$grid$sa.qual[perturbmask], reactivehab$grid$oa.qual[perturbmask])    
   })
 
   observeEvent(input$perturb_reset, {
-    data(habgrids)
-    attr(habgrids, "wasmodded") = attr(habgrids, "wasmodded") + 1
+    reactivehab$grid = habgrids
   })
 
 })
