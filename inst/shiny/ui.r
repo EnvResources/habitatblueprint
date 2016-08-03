@@ -32,7 +32,9 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
             choices = c("Overall Habitat" = "habitat", 
               "Temperature Habitat" = "ta.qual", 
               "Salinity Habitat"  = "sa.qual", 
-              "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")
+              "Dissolved Oxygen Habitat"  = "oa.qual",
+              "Temperature (raw)" = "ta", "Salinity (raw)" = "sa",
+              "Dissolved Oxygen (raw)" = "oa"), width = "50%")
         ),
         plotOutput("grid_plot"),
         fluidRow(
@@ -73,6 +75,21 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
         plotOutput("period_alldepth"),
         plotOutput("period_bydepth", height = "1200px")
       )
+    )
+  ),
+  tabPanel("Perturb Transect", value = "perturb",
+    sidebarLayout(
+      sidebarPanel(
+        uiOutput("perturb_date"),
+        numericInput("perturb_val", "Adjust by", width = "50%", value = 0),
+        actionButton("perturb_action", "Perturb", width = "25%"),
+        actionButton("perturb_reset", "Reset", width = "25%")
+      ),
+      mainPanel(
+        h3(selectInput("perturb_var", NULL, choices = c("Temperature" = "ta", 
+          "Salinity" = "sa", "Dissolved Oxygen" = "oa"), width = "50%")),
+        plotOutput("perturb_plot")
+      )  
     )
   ),
   tabPanel("Quit", value = "stop")

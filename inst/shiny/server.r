@@ -1,11 +1,15 @@
 data(ctdmeta)
-data(habgrids)
 data(inflows)
 data(tides)
 data(wll)
+shinyServer(function(input, output, session){
+data(habgrids)
+attr(habgrids, "wasmodded") = 0
 
-shinyServer(function(input, output){
-
+habgrids.poll = reactivePoll(500, session, 
+  function() attr(habgrids, "wasmodded"), 
+  function() habgrids )
+  
   observe({
     if(input$navbar == "stop")
       stopApp()
@@ -67,7 +71,7 @@ shinyServer(function(input, output){
   transectdate = reactive(strftime(ctdmeta[input$transect_date, "start"], 
     "%Y-%m-%d", tz = "US/Pacific"))
   transectid = reactive(ctdmeta[input$transect_date, "id"])
-  griddata = reactive(mutate_(filter(habgrids, date == transectdate(), 
+  griddata = reactive(mutate_(filter(habgrids.poll(), date == transectdate(), 
     id == transectid()), habitat = input$habitat_type))
 
   # plot settings
@@ -103,17 +107,27 @@ shinyServer(function(input, output){
 )
   habitat.colors = reactive({
     switch(input$habitat_type, 
-      "habitat" = overall.colors,
-      "ta.qual" = ta.colors,
-      "sa.qual" = sa.colors,
-      "oa.qual" = oa.colors
+      "habitat" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "ta.qual" = scale_fill_manual("Temperature quality", 
+        values = ta.colors, drop = FALSE),
+      "sa.qual" = scale_fill_manual("Salinity quality", 
+        values = sa.colors, drop = FALSE),
+      "oa.qual" = scale_fill_manual("Dissolved oxygen quality", 
+        values = oa.colors, drop = FALSE),
+      "ta" = scale_fill_distiller("Temperature", type = "div", 
+        palette = "RdYlBu", guide = "colourbar"),
+      "sa" = scale_fill_distiller("Salinity", type = "div", 
+        palette = "PRGn", guide = "colourbar"),
+      "oa" = scale_fill_distiller("Dissolved Oxygen", type = "div", 
+        palette = "RdYlGn", guide = "colourbar", direction = -1)
     )
   })
   
   # plot the main grid
   habitat.plot = reactive(ggplot(griddata(), aes(x = dist, y = elev, 
       fill = habitat)) + geom_raster() + 
-      plot.settings + scale_fill_manual("", values = habitat.colors()) + 
+      plot.settings + habitat.colors() + 
       theme(legend.position = "none")  
   )
   output$grid_plot = renderPlot({
@@ -130,8 +144,7 @@ shinyServer(function(input, output){
   )
   cat.plot = reactive(ggplot(catdata(), aes(x = habitat, y = volume, 
     fill = habitat)) + geom_bar(stat = "identity") + 
-    scale_fill_manual("overall habitat quality", values = habitat.colors(), 
-      drop = FALSE) + cat.settings + theme(legend.position = "left")
+    habitat.colors() + cat.settings + theme(legend.position = "left")
   )
   output$category_bar = renderPlot({
     cat.plot()
@@ -154,8 +167,7 @@ shinyServer(function(input, output){
 
   cat.depth = reactive(ggplot(depthdata(), aes(x = habitat, y = volume, 
     fill = habitat)) + geom_bar(stat = "identity") + 
-    scale_fill_manual("overall habitat quality", values = habitat.colors(), 
-      drop = FALSE) + cat.settings + theme(legend.position = "none") + 
+    habitat.colors() + cat.settings + theme(legend.position = "none") + 
     facet_wrap(~ depth.zone) + theme(axis.title.y = element_blank())
   )
   
@@ -249,7 +261,7 @@ shinyServer(function(input, output){
     "%Y-%m-%d", tz = "US/Pacific"))
   periodtime = reactive(ctdmeta[periodrange(), "start"])
   periodid = reactive(ctdmeta[periodrange(), "id"])
-  periodgrids = reactive(mutate_(filter(habgrids, date %in% as.Date(perioddate()), 
+  periodgrids = reactive(mutate_(filter(habgrids.poll(), date %in% as.Date(perioddate()), 
     id %in% periodid()), habitat = input$period_habitat_type))
 
     period.habitat.colors = reactive({
@@ -389,4 +401,56 @@ shinyServer(function(input, output){
         facet_wrap(~ depth.zone, ncol = 1, scales = "free_y")
     }
   })
+
+########## Perturbate Transect ###################################################  
+
+########## main panel ##########
+  output$perturb_date = renderUI({
+    selectInput("perturb_date", "Select transect", size = 10, selected = 1, 
+      selectize = FALSE, choices = setNames(seq(nrow(ctdmeta)), 
+        paste(strftime(ctdmeta$start, "%Y-%m-%d"), 
+          paste0(strftime(ctdmeta$start, "%H:%M"), "--",  
+            strftime(ctdmeta$end, "%H:%M")), 
+          paste0("(", ctdmeta$code,")")))
+    )
+  })
+
+  # get the grid for selected transect
+  perturbdate = reactive(strftime(ctdmeta[input$perturb_date, "start"], 
+    "%Y-%m-%d", tz = "US/Pacific"))
+  perturbid = reactive(ctdmeta[input$perturb_date, "id"])
+  perturbdata = reactive(mutate_(filter(habgrids.poll(), date == perturbdate(), 
+    id == perturbid()), habitat = input$perturb_var))
+
+  perturb.habitat.colors = reactive({
+    switch(input$perturb_var, 
+      "ta" = scale_fill_distiller("Temperature", type = "div", 
+        palette = "RdYlBu", guide = "colourbar"),
+      "sa" = scale_fill_distiller("Salinity", type = "div", 
+        palette = "PRGn", guide = "colourbar"),
+      "oa" = scale_fill_distiller("Dissolved Oxygen", type = "div", 
+        palette = "RdYlGn", guide = "colourbar", direction = -1)
+    )
+  })
+
+  perturb.plot = reactive(ggplot(perturbdata(), aes(x = dist, y = elev, 
+      fill = habitat)) + geom_raster() + 
+      plot.settings + perturb.habitat.colors() 
+  )
+  output$perturb_plot = renderPlot({
+    perturb.plot()
+  })
+
+  observeEvent(input$perturb_action, {
+    perturbmask = (habgrids$date == perturbdate()) & 
+      (habgrids$id == perturbid())
+    habgrids[perturbmask, input$perturb_var] = habgrids[[input$perturb_var]][perturbmask] + input$perturb_val
+    attr(habgrids, "wasmodded") = attr(habgrids, "wasmodded") + 1
+  })
+
+  observeEvent(input$perturb_reset, {
+    data(habgrids)
+    attr(habgrids, "wasmodded") = attr(habgrids, "wasmodded") + 1
+  })
+
 })
