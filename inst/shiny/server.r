@@ -7,7 +7,6 @@ data(habgrids)
 shinyServer(function(input, output, session){
 
 reactivehab = reactiveValues(grid = habgrids)
-  
   observe({
     if(input$navbar == "stop")
       stopApp()
@@ -417,9 +416,18 @@ reactivehab = reactiveValues(grid = habgrids)
   perturbdate = reactive(strftime(ctdmeta[input$perturb_date, "start"], 
     "%Y-%m-%d", tz = "US/Pacific"))
   perturbid = reactive(ctdmeta[input$perturb_date, "id"])
-  perturbdata = reactive(mutate_(filter(reactivehab$grid, date == perturbdate(), 
-    id == perturbid()), habitat = input$perturb_var))
-
+  perturbdata = reactive({
+    res = mutate_(filter(reactivehab$grid, date == perturbdate(), 
+    id == perturbid()), habitat = input$perturb_var)
+    updateSliderInput(session, "window_dist", 
+      min = min(res$dist), max = max(res$dist), step = 100,
+      value = c(min(res$dist), max(res$dist)))
+    updateSliderInput(session, "window_elev", 
+      min = min(res$elev), max = max(res$elev), step = 0.1,
+      value = c(min(res$elev), max(res$elev)))
+    res
+    })
+  
   perturb.habitat.colors = reactive({
     switch(input$perturb_var, 
       "ta" = scale_fill_distiller("Temperature", type = "div", 
@@ -435,12 +443,24 @@ reactivehab = reactiveValues(grid = habgrids)
       fill = habitat)) + geom_raster() + 
       plot.settings + perturb.habitat.colors() 
   )
+  
+  perturb.window = reactive({
+    d = data.frame(dist = rep(input$window_dist, each = 2),
+      elev = c(input$window_elev, rev(input$window_elev)))
+    geom_polygon(data = d, fill = NA, color = "black")
+  })
+  
   output$perturb_plot = renderPlot({
-    perturb.plot()
+    perturb.plot() + perturb.window()
   })
 
   observeEvent(input$perturb_action, {
-    perturbmask = (reactivehab$grid$date == perturbdate()) & (reactivehab$grid$id == perturbid())
+    perturbmask = ( reactivehab$grid$date == perturbdate() ) & 
+      ( reactivehab$grid$id == perturbid() ) &
+      ( reactivehab$grid$dist >= min(input$window_dist) ) & 
+      ( reactivehab$grid$dist <= max(input$window_dist) ) &
+      ( reactivehab$grid$elev >= min(input$window_elev) ) & 
+      ( reactivehab$grid$elev <= max(input$window_elev) )
     reactivehab$grid[perturbmask, input$perturb_var] = reactivehab$grid[[input$perturb_var]][perturbmask] + input$perturb_val
     classfun = switch(input$perturb_var, 
       sa = habitatblueprint:::classify_sa, 

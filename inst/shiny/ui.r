@@ -81,9 +81,25 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
     sidebarLayout(
       sidebarPanel(
         uiOutput("perturb_date"),
-        numericInput("perturb_val", "Adjust by", width = "50%", value = 0),
-        actionButton("perturb_action", "Perturb", width = "25%"),
-        actionButton("perturb_reset", "Reset", width = "25%")
+        sliderInput("window_dist", label = "Perturbation window", min = 0, 
+          max = 12200, value = c(0, 12200), step = 100, ticks = FALSE),
+        sliderInput("window_elev", label = NULL, min = -16, 
+          max = 3, value = c(-16, 3), step = 0.1, ticks = FALSE),
+        fluidRow(
+          column(3,
+            helpText("Adjust by")
+          ),
+          column(3,
+            numericInput("perturb_val",  label = NULL, width = "100%", 
+              value = 0)
+          ),
+          column(3,
+            actionButton("perturb_action", "Perturb", width = "100%")
+          ),
+          column(3,
+            actionButton("perturb_reset", "Reset", width = "100%")
+          )
+        )
       ),
       mainPanel(
         h3(selectInput("perturb_var", NULL, choices = c("Temperature" = "ta", 
