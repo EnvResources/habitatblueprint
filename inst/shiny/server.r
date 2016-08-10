@@ -30,36 +30,44 @@ reactivehab = reactiveValues(grid = habgrids)
  # prep for flow/tide/wll plots
   intervalstart = reactive(ctdmeta[input$transect_date, "start"] - 3.5*86400)
   intervalend = reactive(ctdmeta[input$transect_date, "start"] + 3.5*86400)
-  inflowdata = reactive(filter(inflows, datetime >= intervalstart(),
-    datetime <= intervalend(), gauge == "russian river"))
-  tidedata = reactive(filter(tides, datetime >= intervalstart(),
-    datetime <= intervalend()))
-  wlldata = reactive(filter(wll, mtime >= intervalstart(),
-    mtime <= intervalend(), site == "jenner"))
   x.scale = reactive(scale_x_datetime("", limits = c(intervalstart(), 
     intervalend())))
+  transect.lines = reactive({
+    d = data.frame(date = as.numeric(ctdmeta[input$transect_date, "start"]),
+      availability = ifelse(ctdmeta[input$transect_date, "numcasts"] < 12, 
+        "partial", "complete"))
+    list(
+      geom_vline(data = d, aes(xintercept = date, linetype = availability)),
+      scale_linetype_manual(values = c("complete" = "solid", 
+        "partial" = "dashed"), guide = FALSE)
+    )
+  })
+  
   # plot the flows
+  inflowdata = reactive(filter(inflows, datetime >= intervalstart(),
+    datetime <= intervalend(), gauge == "russian river"))
   output$transect_flows = renderPlot({
     ggplot(inflowdata(), aes(x = datetime, y = flow)) + 
     geom_line(color = "#377eb8") + ggtitle("Russian River Flow") +
-    geom_vline(xintercept = as.numeric(ctdmeta[input$transect_date, "start"]), 
-      linetype = "dashed") + ylab("inflow (m3/s)") + x.scale()
+    transect.lines() + ylab("inflow (m3/s)") + x.scale()
   })
   
   # plot the tides
+  tidedata = reactive(filter(tides, datetime >= intervalstart(),
+    datetime <= intervalend()))
   output$transect_tides = renderPlot({
     ggplot(tidedata(), aes(x = datetime, y = height)) + 
     geom_line(color = "#377eb8") + ggtitle("Point Reyes Tide Height") +
-    geom_vline(xintercept = as.numeric(ctdmeta[input$transect_date, "start"]), 
-      linetype = "dashed") + ylab("tide height (MLLW, m)") + x.scale() 
+    transect.lines() + ylab("tide height (MLLW, m)") + x.scale() 
   })    
   
   # plot the water level
+  wlldata = reactive(filter(wll, mtime >= intervalstart(),
+    mtime <= intervalend(), site == "jenner"))
   output$transect_wll = renderPlot({
     ggplot(wlldata(), aes(x = mtime, y = depth)) + 
     geom_line(color = "#377eb8") + ggtitle("Water Depth at Jenner") +
-    geom_vline(xintercept = as.numeric(ctdmeta[input$transect_date, "start"]), 
-      linetype = "dashed") + ylab("water depth (m)") + x.scale()
+    transect.lines() + ylab("water depth (m)") + x.scale()
   })    
 
 ########## main panel ##########
@@ -80,31 +88,33 @@ reactivehab = reactiveValues(grid = habgrids)
   )
   overall.colors = c(
     "optimal" = "#1f78b4",
-    "sub-optimal (T)" = "#a6cee3",
-    "sub-optimal (DO)" = "#33a02c",
-    "sub-optimal (S)" = "#6a3d9a",
-    "sub-optimal (T, DO)" = "#fb9a99",
-    "sub-optimal (T, S)" = "#fdbf6f",
-    "sub-optimal (DO, S)" = "#b2df8a",
-    "sub-optimal (T, DO, S)" = "#cab2d6",
-    "stressful (T)" = "#ffff99",
-    "stressful sub-optimal (T, DO)" = "#e31a1c",
-    "stressful sub-optimal (T, S)" = "#ff7f00",
-    "stressful sub-optimal (T, DO, S)" = "#b15928",   
+    "growth limited" = "#a6cee3",
+    "impaired" = "#33a02c",
+    "severely impaired" = "#6a3d9a",
+    "energy demanding" = "#fb9a99",
+    "growth limited, impaired" = "#fdbf6f",
+    "growth limited, severely impaired" = "#b2df8a",
+    "growth limited, energy demanding" = "#cab2d6",
+    "impaired, energy demanding" = "#ffff99",
+    "severely impaired, energy demanding" = "#e31a1c",
+    "growth limited, impaired, energy demanding" = "#ff7f00",
+    "growth limited, severely impaired, energy demanding" = "#b15928",   
     "unsuitable" = "#000000"
   )
   ta.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", 
-    "stressful", "suitable", "optimal"))
-  sa.colors = setNames(brewer.pal(4, "RdYlGn"), c("ion exporting", 
-    "induced ion exporting", "ion neutral", "ion importing"))
-  oa.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", "limited", 
-    "suitable", "no impairment"))
+    "negative/no growth", "positive growth", "optimal growth"))
+  sa.colors = setNames(c("#7b3294", "#c2a5cf", "#92c5de", "#0571b0"), 
+    c("marine", "brackish", "isotonic", "freshwater"))
+  oa.colors = setNames(rev(brewer.pal(4, "PuRd")), c("unsuitable", 
+    "severe impairment", "some impairment", "minimal impairment"))
   depth.colors = setNames(brewer.pal(5, "BuPu"), c("littoral",
     "surface limnetic", "epibenthic", "subsurface limnetic", "profundal")
 )
   habitat.colors = reactive({
     switch(input$habitat_type, 
-      "habitat" = scale_fill_manual("Overall habitat quality", 
+      "habitat.fwa" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "habitat.swa" = scale_fill_manual("Overall habitat quality", 
         values = overall.colors, drop = FALSE),
       "ta.qual" = scale_fill_manual("Temperature quality", 
         values = ta.colors, drop = FALSE),
@@ -117,7 +127,7 @@ reactivehab = reactiveValues(grid = habgrids)
       "sa" = scale_fill_distiller("Salinity\n", type = "div", 
         palette = "PRGn", guide = "colourbar"),
       "oa" = scale_fill_distiller("Dissolved Oxygen\n", type = "div", 
-        palette = "RdYlGn", guide = "colourbar", direction = -1)
+        palette = "BrBG", direction = 1, guide = "colourbar")
     )
   })
   
@@ -132,26 +142,57 @@ reactivehab = reactiveValues(grid = habgrids)
   })
   
   # plot the categories
-  catdata = reactive(summarize(group_by(griddata(), habitat), 
-    volume = sum(volume.total)))
   cat.settings = list(
-    scale_y_continuous("total volume (m3)", labels = comma),
+    scale_y_continuous("total volume (m3)\n", labels = comma),
     theme(axis.text.x = element_blank(), axis.title.x = element_blank(), 
       axis.ticks.x = element_blank())
   )
-  cat.plot = reactive(ggplot(catdata(), aes(x = habitat, y = volume, 
-    fill = habitat)) + geom_bar(stat = "identity") + 
+
+  catdata = reactive(summarize(group_by(griddata(), date, habitat), 
+    volume = sum(volume.total)))
+
+  cat.plot = reactive(ggplot(arrange(catdata(), -as.numeric(habitat)), 
+    aes(x = date, y = volume, fill = habitat)) + 
+    geom_bar(stat = "identity", position = "stack") + 
     habitat.colors() + cat.settings + theme(legend.position = "left")
   )
   output$category_bar = renderPlot({
     cat.plot()
   })
 
+  # overall volume
+  depthvoldata = reactive({
+    depthvoldata = gather(summarize(group_by(griddata(), date, habitat), 
+      volume.littoral = sum(volume.littoral),
+      volume.limnetic = sum(volume.limnetic), 
+      volume.epibenthic = sum(volume.epibenthic),
+      volume.sublimnetic = sum(volume.sublimnetic),
+      volume.profundal = sum(volume.profundal)
+      ), depth.cat, volume, -habitat, -date)
+  depthvoldata["depth.cat"] = factor(depthvoldata$depth.cat, 
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))
+  depthvoldata
+  })
+  vol.depth = reactive(ggplot(depthvoldata(), aes(x = date, y = volume, 
+    fill = depth.cat)) + geom_bar(stat = "identity") + 
+    scale_fill_manual("depth category", values = depth.colors, 
+      drop = FALSE) + cat.settings +
+    theme(axis.text.y = element_blank(), axis.title.y = element_blank(), 
+      axis.ticks.y = element_blank())
+      
+  )
+  output$depth_vol = renderPlot({
+    vol.depth()
+  })
+  
   # plot by depth
   depthdata = reactive({
     depthdata = summarize(group_by(gather(griddata(), depth.zone, 
       volume, volume.littoral, volume.limnetic, volume.epibenthic, 
-      volume.sublimnetic, volume.profundal), depth.zone, habitat), 
+      volume.sublimnetic, volume.profundal), date, depth.zone, habitat), 
       volume = sum(volume))
     depthdata["depth.zone"] = factor(depthdata$depth.zone, 
       levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
@@ -162,41 +203,17 @@ reactivehab = reactiveValues(grid = habgrids)
   })
       
 
-  cat.depth = reactive(ggplot(depthdata(), aes(x = habitat, y = volume, 
-    fill = habitat)) + geom_bar(stat = "identity") + 
+  cat.depth = reactive(ggplot(arrange(depthdata(), -as.numeric(habitat)), 
+    aes(x = date, y = volume, fill = habitat)) + 
+    geom_bar(stat = "identity", position = "stack") + 
     habitat.colors() + cat.settings + theme(legend.position = "none") + 
-    facet_wrap(~ depth.zone) + theme(axis.title.y = element_blank())
+    facet_wrap(~ depth.zone, nrow = 1) + theme(axis.title.y = element_blank())
   )
   
   output$depth_cat = renderPlot({
     cat.depth()
   })
-  
-  # overall volume
-  depthvoldata = reactive({
-    depthvoldata = gather(summarize(group_by(griddata(), habitat), 
-      volume.littoral = sum(volume.littoral),
-      volume.limnetic = sum(volume.limnetic), 
-      volume.epibenthic = sum(volume.epibenthic),
-      volume.sublimnetic = sum(volume.sublimnetic),
-      volume.profundal = sum(volume.profundal)
-      ), depth.cat, volume, -habitat)
-  depthvoldata["depth.cat"] = factor(depthvoldata$depth.cat, 
-      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
-        "volume.sublimnetic", "volume.profundal"), 
-      labels = c("littoral", "surface limnetic", "epibenthic", 
-        "subsurface limnetic", "profundal"))
-  depthvoldata
-  })
-  vol.depth = reactive(ggplot(depthvoldata(), aes(x = depth.cat, y = volume, 
-    fill = depth.cat)) + geom_bar(stat = "identity", position = "stack") + 
-    scale_fill_manual("depth category", values = depth.colors, 
-      drop = FALSE) + cat.settings #+ theme(legend.position = "none") 
-  )
-  output$depth_vol = renderPlot({
-    vol.depth()
-  })
-  
+    
   
 ########### Explore Periods ###################################################
 
@@ -226,10 +243,16 @@ reactivehab = reactiveValues(grid = habgrids)
     periodend())))
   
   region.setting = reactive({
-    geom_vline(xintercept = as.numeric(ctdmeta[periodrange(), "start"]), 
-      linetype = "dashed", color = "black")
+    d = data.frame(date = as.numeric(ctdmeta[periodrange(), "start"]),
+      availability = ifelse(ctdmeta[periodrange(), "numcasts"] < 12, 
+        "partial", "complete"))
+    list(
+      geom_vline(data = d, aes(xintercept = date, linetype = availability)),
+      scale_linetype_manual(values = c("complete" = "solid", 
+        "partial" = "dashed"), guide = FALSE)
+    )
   })
-
+  
   # plot the flows
   output$period_flows = renderPlot({
     ggplot(periodinflow(), aes(x = datetime, y = flow)) + 
@@ -263,7 +286,8 @@ reactivehab = reactiveValues(grid = habgrids)
 
     period.habitat.colors = reactive({
     switch(input$period_habitat_type, 
-      "habitat" = overall.colors,
+      "habitat.fwa" = overall.colors,
+      "habitat.swa" = overall.colors,
       "ta.qual" = ta.colors,
       "sa.qual" = sa.colors,
       "oa.qual" = oa.colors
@@ -467,8 +491,10 @@ reactivehab = reactiveValues(grid = habgrids)
       ta = habitatblueprint:::classify_ta, 
       oa = habitatblueprint:::classify_oa)
     reactivehab$grid[perturbmask, paste0(input$perturb_var, ".qual")] = classfun(reactivehab$grid[[input$perturb_var]][perturbmask])
-    reactivehab$grid[perturbmask, "habitat"] = habitatblueprint:::classify_overall(reactivehab$grid$ta.qual[perturbmask], 
-      reactivehab$grid$sa.qual[perturbmask], reactivehab$grid$oa.qual[perturbmask])    
+    reactivehab$grid[perturbmask, "habitat.fwa"] = habitatblueprint:::classify_freshwater(reactivehab$grid$ta.qual[perturbmask], 
+      reactivehab$grid$sa.qual[perturbmask], reactivehab$grid$oa.qual[perturbmask])
+    reactivehab$grid[perturbmask, "habitat.swa"] = habitatblueprint:::classify_saltwater(reactivehab$grid$ta.qual[perturbmask], 
+      reactivehab$grid$sa.qual[perturbmask], reactivehab$grid$oa.qual[perturbmask])
   })
 
   observeEvent(input$perturb_reset, {

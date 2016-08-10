@@ -29,7 +29,9 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
       ),
       mainPanel(
         h3(selectInput("habitat_type", NULL, 
-            choices = c("Overall Habitat" = "habitat", 
+            choices = c(
+              "Overall Habitat (freshwater-acclimated)" = "habitat.fwa", 
+              "Overall Habitat (saltwater-acclimated)" = "habitat.swa",
               "Temperature Habitat" = "ta.qual", 
               "Salinity Habitat"  = "sa.qual", 
               "Dissolved Oxygen Habitat"  = "oa.qual",
@@ -38,10 +40,10 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
         ),
         plotOutput("grid_plot"),
         fluidRow(
-          column(6, 
+          column(7, 
             plotOutput("category_bar")
           ),
-          column(6,
+          column(5,
             plotOutput("depth_vol")
           )
         ),
@@ -67,7 +69,9 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
       ),
       mainPanel(
         h3(selectInput("period_habitat_type", NULL, 
-            choices = c("Overall Habitat" = "habitat", 
+            choices = c(
+              "Overall Habitat (freshwater-acclimated)" = "habitat.fwa", 
+              "Overall Habitat (saltwater-acclimated)" = "habitat.swa",
               "Temperature Habitat" = "ta.qual", 
               "Salinity Habitat"  = "sa.qual", 
               "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")),
