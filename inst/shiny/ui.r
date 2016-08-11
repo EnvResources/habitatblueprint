@@ -28,6 +28,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
         plotOutput("transect_wll")
       ),
       mainPanel(
+        tags$style(type = "text/css", ".selectize-dropdown-content {max-height: 400px;}"),
         h3(selectInput("habitat_type", NULL, 
             choices = c(
               "Overall Habitat (freshwater-acclimated)" = "habitat.fwa", 
@@ -74,7 +75,7 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
               "Overall Habitat (saltwater-acclimated)" = "habitat.swa",
               "Temperature Habitat" = "ta.qual", 
               "Salinity Habitat"  = "sa.qual", 
-              "Dissolved Oxygen Habitat"  = "oa.qual"), width = "50%")),
+              "Dissolved Oxygen Habitat"  = "oa.qual"), width = "60%")),
         plotOutput("period_overall"),
         plotOutput("period_alldepth"),
         plotOutput("period_bydepth", height = "1200px")

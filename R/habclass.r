@@ -44,43 +44,33 @@ classify_freshwater = function(ta, sa, oa){
       "isotonic")))
       return("growth limited")
     if(all(xs %in% c("optimal growth", "positive growth", "some impairment",   
-      "isotonic", "freshwater")))
+      "severe impairment", "isotonic", "freshwater")))
       return("impaired")
-    if(all(xs %in% c("optimal growth", "positive growth", "severe impairment",   
-      "isotonic", "freshwater")))
-      return("severely impaired")
     if(all(xs %in% c("optimal growth", "positive growth", "minimal impairment",   
       "brackish")))
       return("energy demanding")
-    if(all(xs %in% c("negative/no growth", "some impairment", "isotonic", 
-      "freshwater")))
+    if(all(xs %in% c("negative/no growth", "some impairment", 
+      "severe impairment", "isotonic", "freshwater")))
       return("growth limited, impaired")
-    if(all(xs %in% c("negative/no growth", "severe impairment", "isotonic", 
-      "freshwater")))
-      return("growth limited, severely impaired")
     if(all(xs %in% c("negative/no growth", "minimal impairment", "brackish")))
       return("growth limited, energy demanding")
     if(all(xs %in% c("optimal growth", "positive growth", "some impairment",   
-      "brackish")))
+      "severe impairment", "brackish")))
       return("impaired, energy demanding")
-    if(all(xs %in% c("optimal growth", "positive growth", "severe impairment",   
-      "brackish")))
-      return("severely impaired, energy demanding")
-    if(all(xs %in% c("negative/no growth", "some impairment", "brackish")))
+    if(all(xs %in% c("negative/no growth", "some impairment", 
+      "severe impairment", "brackish")))
       return("growth limited, impaired, energy demanding")
-    if(all(xs %in% c("negative/no growth", "severe impairment", "brackish")))
-      return("growth limited, severely impaired, energy demanding")
     if(any(xs %in% c("unsuitable", "marine")))
       return("unsuitable")
     stop("no category for ", paste(c("ta", "oa", "sa"), xs, sep = " = ", 
       collapse = ", "))
   }
   factor(apply(data.frame(ta, oa, sa), 1, hab_cat),
-    levels = c("optimal", "growth limited", "impaired", 
-      "severely impaired", "energy demanding", "growth limited, impaired",
-      "growth limited, severely impaired", "growth limited, energy demanding", "impaired, energy demanding", "severely impaired, energy demanding", 
+    levels = c("optimal", "growth limited", "impaired", "energy demanding", 
+      "growth limited, impaired", "growth limited, energy demanding", 
+      "impaired, energy demanding", 
       "growth limited, impaired, energy demanding", 
-      "growth limited, severely impaired, energy demanding", "unsuitable"))
+      "unsuitable"))
 }
 
 classify_saltwater = function(ta, oa, sa){
@@ -92,32 +82,22 @@ classify_saltwater = function(ta, oa, sa){
       "brackish", "isotonic")))
       return("growth limited")
     if(all(xs %in% c("optimal growth", "positive growth", "some impairment",   
-      "isotonic", "freshwater", "brackish")))
+      "severe impairment", "isotonic", "freshwater", "brackish")))
       return("impaired")
-    if(all(xs %in% c("optimal growth", "positive growth", "severe impairment",   
-      "isotonic", "freshwater", "brackish")))
-      return("severely impaired")
     if(all(xs %in% c("optimal growth", "positive growth", "minimal impairment",   
       "marine")))
       return("energy demanding")
-    if(all(xs %in% c("negative/no growth", "some impairment", "isotonic", 
-      "freshwater", "brackish")))
+    if(all(xs %in% c("negative/no growth", "some impairment", 
+    "severe impairment", "isotonic", "freshwater", "brackish")))
       return("growth limited, impaired")
-    if(all(xs %in% c("negative/no growth", "severe impairment", "isotonic", 
-      "freshwater", "brackish")))
-      return("growth limited, severely impaired")
     if(all(xs %in% c("negative/no growth", "minimal impairment", "marine")))
       return("growth limited, energy demanding")
     if(all(xs %in% c("optimal growth", "positive growth", "some impairment",   
-      "marine")))
+      "severe impairment", "marine")))
       return("impaired, energy demanding")
-    if(all(xs %in% c("optimal growth", "positive growth", "severe impairment",   
-      "marine")))
-      return("severely impaired, energy demanding")
-    if(all(xs %in% c("negative/no growth", "some impairment", "marine")))
+    if(all(xs %in% c("negative/no growth", "some impairment", 
+      "severe impairment", "marine")))
       return("growth limited, impaired, energy demanding")
-    if(all(xs %in% c("negative/no growth", "severe impairment", "marine")))
-      return("growth limited, severely impaired, energy demanding")
     if(any(xs %in% c("unsuitable")))
       return("unsuitable")
     stop("no category for ", paste(c("ta", "oa", "sa"), xs, sep = " = ", 
@@ -125,8 +105,8 @@ classify_saltwater = function(ta, oa, sa){
   }
   factor(apply(data.frame(ta, oa, sa), 1, hab_cat),
     levels = c("optimal", "growth limited", "impaired", 
-      "severely impaired", "energy demanding", "growth limited, impaired",
-      "growth limited, severely impaired", "growth limited, energy demanding", "impaired, energy demanding", "severely impaired, energy demanding", 
+      "energy demanding", "growth limited, impaired",
+      "growth limited, energy demanding", "impaired, energy demanding", 
       "growth limited, impaired, energy demanding", 
-      "growth limited, severely impaired, energy demanding", "unsuitable"))
+      "unsuitable"))
 }

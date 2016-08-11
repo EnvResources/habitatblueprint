@@ -105,7 +105,7 @@ reactivehab = reactiveValues(grid = habgrids)
     "negative/no growth", "positive growth", "optimal growth"))
   sa.colors = setNames(c("#7b3294", "#c2a5cf", "#92c5de", "#0571b0"), 
     c("marine", "brackish", "isotonic", "freshwater"))
-  oa.colors = setNames(rev(brewer.pal(4, "PuRd")), c("unsuitable", 
+  oa.colors = setNames(brewer.pal(4, "BrBG"), c("unsuitable", 
     "severe impairment", "some impairment", "minimal impairment"))
   depth.colors = setNames(brewer.pal(5, "BuPu"), c("littoral",
     "surface limnetic", "epibenthic", "subsurface limnetic", "profundal")
