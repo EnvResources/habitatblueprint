@@ -62,12 +62,12 @@ reactivehab = reactiveValues(grid = habgrids)
   })    
   
   # plot the water level
-  wlldata = reactive(filter(wll, mtime >= intervalstart(),
-    mtime <= intervalend(), site == "jenner"))
+  wlldata = reactive(filter(wll2, mtime >= intervalstart(),
+    mtime <= intervalend()))
   output$transect_wll = renderPlot({
-    ggplot(wlldata(), aes(x = mtime, y = depth)) + 
-    geom_line(color = "#377eb8") + ggtitle("Water Depth at Jenner") +
-    transect.lines() + ylab("water depth (m)") + x.scale()
+    ggplot(wlldata(), aes(x = mtime, y = wll)) + 
+    geom_line(color = "#377eb8") + ggtitle("Water surface elevation at Jenner") +
+    transect.lines() + ylab("water surface elevation (NGVD29, m)") + x.scale()
   })    
 
 ########## main panel ##########
@@ -234,8 +234,8 @@ reactivehab = reactiveValues(grid = habgrids)
     datetime <= periodend(), gauge == "russian river"))
   periodtide = reactive(filter(tides, datetime >= periodstart(),
     datetime <= periodend()))
-  periodwll = reactive(filter(wll, mtime >= periodstart(),
-    mtime <= periodend(), site == "jenner"))
+  periodwll = reactive(filter(wll2, mtime >= periodstart(),
+    mtime <= periodend()))
   period.x.scale = reactive(scale_x_datetime("", limits = c(periodstart(), 
     periodend())))
   
@@ -266,9 +266,9 @@ reactivehab = reactiveValues(grid = habgrids)
   
   # plot the water level
   output$period_wll = renderPlot({
-    ggplot(periodwll(), aes(x = mtime, y = depth)) + 
-    geom_line(color = "#377eb8") + ggtitle("Water Depth at Jenner") +
-    ylab("water depth (m)") + period.x.scale() + region.setting()
+    ggplot(periodwll(), aes(x = mtime, y = wll)) + 
+    geom_line(color = "#377eb8") + ggtitle("Water Surface Elevation at Jenner") +
+    ylab("water surface elevation (NGVD29, m)") + period.x.scale() + region.setting()
   })
   
 ########## main panel ##########
