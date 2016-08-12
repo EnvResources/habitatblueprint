@@ -7,23 +7,29 @@ and dissolved oxygen thresholds, with four categories defined for each variable.
 The individual ratings are then aggregated to classify overall habitat within 
 13 categories. The habitat categories are defined below.
 
+
 #### Temperature:
 
-| optimal growth        | positive growth (suitable)                    | no or negative growth (stressful) | unsuitable           |
-|:---------------------:|:---------------------------------------------:|:---------------------------------:|:--------------------:|
+| optimal growth        | positive growth (suitable)                    | no or negative growth             | unsuitable           |
+|:----------------------|:----------------------------------------------|:----------------------------------|:---------------------|
 | $14-18^\circ\text{C}$ | $< 14^\circ\text{C}$ or $18-21^\circ\text{C}$ | $21--25^\circ\text{C}$            | $> 25^\circ\text{C}$ |
+
 
 #### Dissolved Oxygen:
 
-| function without impairment | suitable           | limited by lack of oxygen | unsuitable         |
-|:---------------------------:|:------------------:|:-------------------------:|:------------------:|
+| minimal impairment          | some impairment    | severe impairment         | unsuitable         |
+|:----------------------------|:-------------------|:--------------------------|:-------------------|
 | $> 6 \text{ mg/L}$          | $4-6 \text{ mg/L}$ | $3-4 \text{ mg/L}$        | $< 3 \text{ mg/L}$ |
+
 
 #### Salinity:
 
-| ion importing      | ion neutral         | induced ion exporting | ion exporting      |
-|:------------------:|:-------------------:|:---------------------:|:------------------:|
-| $< 10 \text{ ppt}$ | $10-15 \text{ ppt}$ | $15-28 \text{ ppt}$   | $> 28 \text{ ppt}$ |
+| freshwater           | isotonic                   | brackish                                     | marine                                       |
+|:---------------------|:---------------------------|:---------------------------------------------|:---------------------------------------------|
+| $< 10 \text{ ppt}$   | $10-15 \text{ ppt}$        | $15-28 \text{ ppt}$                          | $> 28 \text{ ppt}$                           |
+| *Low energy demand*  | *negligible energy demand* | *high energy demand (freshwater-acclimated)* | *unsuitable (freshwater acclimated)*         |
+|                      |                            | *low energy demand (marine-acclimated)*      | *moderate energy demand (marine-aclimated)*  |
+
 
 #### Overall habitat
 
@@ -56,3 +62,4 @@ water depth.
 | Epibenthic                | High prey availability, low avian predation risk, moderate aquatic predation risk | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} \leq 5$ |
 | Subsurface Limnetic       | Low prey availability, low avian predation risk, moderate aquatic predation risk  | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} > 5$    |
 | Profundal                 | Low prey availability, no predation risk                                         | $depth > 5\text{m}$                                            |
+

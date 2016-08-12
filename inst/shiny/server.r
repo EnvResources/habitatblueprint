@@ -87,23 +87,19 @@ reactivehab = reactiveValues(grid = habgrids)
     xlab("distance from river mouth (m)")
   )
   overall.colors = c(
-    "optimal" = "#1f78b4",
-    "growth limited" = "#a6cee3",
-    "impaired" = "#33a02c",
-    "severely impaired" = "#6a3d9a",
-    "energy demanding" = "#fb9a99",
-    "growth limited, impaired" = "#fdbf6f",
-    "growth limited, severely impaired" = "#b2df8a",
-    "growth limited, energy demanding" = "#cab2d6",
-    "impaired, energy demanding" = "#ffff99",
-    "severely impaired, energy demanding" = "#e31a1c",
-    "growth limited, impaired, energy demanding" = "#ff7f00",
-    "growth limited, severely impaired, energy demanding" = "#b15928",   
+    "optimal" = "#66c2a5",
+    "growth limited" = "#ffff99",
+    "impaired" = "#fdbf6f",
+    "energy demanding" = "#cab2d6",
+    "growth limited, impaired" = "#fb9a99",
+    "growth limited, energy demanding" = "#6a3d9a",
+    "impaired, energy demanding" = "#ff7f00",
+    "growth limited, impaired, energy demanding" = "#b15928",
     "unsuitable" = "#000000"
   )
   ta.colors = setNames(brewer.pal(4, "RdYlGn"), c("unsuitable", 
     "negative/no growth", "positive growth", "optimal growth"))
-  sa.colors = setNames(c("#7b3294", "#c2a5cf", "#92c5de", "#0571b0"), 
+  sa.colors = setNames(c("#c51b7d", "#f1b6da", "#92c5de", "#2166ac"), 
     c("marine", "brackish", "isotonic", "freshwater"))
   oa.colors = setNames(brewer.pal(4, "BrBG"), c("unsuitable", 
     "severe impairment", "some impairment", "minimal impairment"))
@@ -176,8 +172,9 @@ reactivehab = reactiveValues(grid = habgrids)
         "subsurface limnetic", "profundal"))
   depthvoldata
   })
-  vol.depth = reactive(ggplot(depthvoldata(), aes(x = date, y = volume, 
-    fill = depth.cat)) + geom_bar(stat = "identity") + 
+  vol.depth = reactive(ggplot(arrange(depthvoldata(), -as.numeric(depth.cat)), 
+    aes(x = date, y = volume, fill = depth.cat)) + 
+    geom_bar(stat = "identity") + 
     scale_fill_manual("depth category", values = depth.colors, 
       drop = FALSE) + cat.settings +
     theme(axis.text.y = element_blank(), axis.title.y = element_blank(), 

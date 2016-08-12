@@ -21,3 +21,15 @@ table td {
     border-bottom: none;
     border-right: none;
 }
+
+
+.selectize {
+  line-height: 40px;
+  height: 40px;
+  padding: 5px;
+}
+
+.selectize-dropdown-content {
+  max-height: 400px;
+}
+

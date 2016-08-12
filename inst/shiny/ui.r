@@ -28,7 +28,6 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
         plotOutput("transect_wll")
       ),
       mainPanel(
-        tags$style(type = "text/css", ".selectize-dropdown-content {max-height: 400px;}"),
         h3(selectInput("habitat_type", NULL, 
             choices = c(
               "Overall Habitat (freshwater-acclimated)" = "habitat.fwa", 
