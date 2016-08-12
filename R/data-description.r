@@ -203,6 +203,8 @@ NULL
 #'
 #' @importFrom shiny runApp
 #' @export
-HabitatBrowser = function(){
-  runApp(system.file("shiny/", package = "habitatblueprint", mustWork = TRUE))
+HabitatBrowser = function(autoscale = FALSE, ...){
+  environment(autoscale) = asNamespace('habitatblueprint')
+  runApp(system.file("shiny/", package = "habitatblueprint", mustWork = TRUE), 
+    ...)
 }

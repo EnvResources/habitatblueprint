@@ -1,9 +1,10 @@
-## Definitions of Physical Habitat
+## Characterizing Physical Habitat For Salmonid Residents
 
 The quality of physical habitat for juvenile salmonids is defined according to
 specifications outlined by the Water Quality Parameter and Habitat Productivity
 Technical Group. Habitat quality is assessed in terms of temperature, salinity
 and dissolved oxygen thresholds, with four categories defined for each variable.
+
 
 #### Temperature:
 
@@ -28,7 +29,7 @@ and dissolved oxygen thresholds, with four categories defined for each variable.
 |                      |                            | *low energy demand (saltwater-aclimated)*      | *moderate energy demand (saltwater-aclimated)*  |
 
 
-## Overall habitat
+## Overall Habitat
 
 To assess the overall habitat quality of a region, the individual ratings are 
 into the 9 categories defined below.

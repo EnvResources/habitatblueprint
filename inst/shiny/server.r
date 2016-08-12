@@ -82,7 +82,7 @@ reactivehab = reactiveValues(grid = habgrids)
   # plot settings
   plot.settings = list(
     xlim(min(habgrids$dist), max(habgrids$dist)),
-    ylim(min(habgrids$elev), max(habgrids$elev)),
+    ylim(-15.8, 3.3),
     ylab("elevation above NAVD29 (m)"),
     xlab("distance from river mouth (m)")
   )
@@ -126,10 +126,16 @@ reactivehab = reactiveValues(grid = habgrids)
         palette = "BrBG", direction = 1, guide = "colourbar")
     )
   })
+
+landmarkdat = data.frame(landmark = c("Penny Island", "CA-1 Bridge", 
+  "Heron Rookery","Mos. Rd. Bridge"), dist = c(1250, 3800, 8000, 10600), 
+  elev = 3.3)
+landmarks = geom_label(data = landmarkdat, aes(x = dist, y = elev, 
+  label = landmark), inherit.aes = FALSE)
   
   # plot the main grid
   habitat.plot = reactive(ggplot(griddata(), aes(x = dist, y = elev, 
-      fill = habitat)) + geom_raster() + 
+      fill = habitat)) + geom_raster() + landmarks +
       plot.settings + habitat.colors() + 
       theme(legend.position = "none")  
   )

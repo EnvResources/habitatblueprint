@@ -5,6 +5,21 @@ All data is processed using the
 author. Please review the package documentation for specific information on 
 processing algorithms.
 
+
+### Interpolating Water Quality Data
+
+Water quality data is available for 12 key locations in the estuary. These 
+locations were periodically sampled using a CTD profiler, which provides 
+high-resolution vertical profiles of key water quality parameters. This data 
+constitutes a data transect that can be interpolated to produce the water 
+quality grids. Interpolation was performed using the Natural Neighbor 
+Interpolation algorithm provided by Matlab and the grids were referenced to 
+the segment delineations by assigning the segment identifier to each sampling 
+location.
+
+![CTD profile sampling locations](samplelocations.png)
+
+
 ### Computing Estuary Volume
 
 Estuary volume computations are derived from the 2009 bathymetry raster and a 
@@ -38,19 +53,4 @@ bathymetry raster resolution to obtain water volumes. The stage-volume curve of
 the estuary for all foraging habitat categories are shown below.
 
 ![Estuary volume by foraging habitat category](stagevolume.png)
-
-### Interpolating Water Quality Data
-
-Water quality data is available for 12 key locations in the estuary. These 
-locations were periodically sampled using a CTD profiler, which provides 
-high-resolution vertical profiles of key water quality parameters. This data 
-constitutes a data transect that can be interpolated to produce the water 
-quality grids. Interpolation was performed using the Natural Neighbor 
-Interpolation algorithm provided by Matlab and the grids were referenced to 
-the segment delineations by assigning the segment identifier to each sampling 
-location.
-
-![CTD profile sampling locations](samplelocations.png)
-
-
 
