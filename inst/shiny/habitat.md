@@ -4,15 +4,12 @@ The quality of physical habitat for juvenile salmonids is defined according to
 specifications outlined by the Water Quality Parameter and Habitat Productivity
 Technical Group. Habitat quality is assessed in terms of temperature, salinity
 and dissolved oxygen thresholds, with four categories defined for each variable.
-The individual ratings are then aggregated to classify overall habitat within 
-13 categories. The habitat categories are defined below.
-
 
 #### Temperature:
 
-| optimal growth        | positive growth (suitable)                    | no or negative growth             | unsuitable           |
-|:----------------------|:----------------------------------------------|:----------------------------------|:---------------------|
-| $14-18^\circ\text{C}$ | $< 14^\circ\text{C}$ or $18-21^\circ\text{C}$ | $21--25^\circ\text{C}$            | $> 25^\circ\text{C}$ |
+| optimal growth        | positive growth                               | no/negative growth     | unsuitable           |
+|:----------------------|:----------------------------------------------|:-----------------------|:---------------------|
+| $14-18^\circ\text{C}$ | $< 14^\circ\text{C}$ or $18-21^\circ\text{C}$ | $21--25^\circ\text{C}$ | $> 25^\circ\text{C}$ |
 
 
 #### Dissolved Oxygen:
@@ -24,42 +21,46 @@ The individual ratings are then aggregated to classify overall habitat within
 
 #### Salinity:
 
-| freshwater           | isotonic                   | brackish                                     | marine                                       |
-|:---------------------|:---------------------------|:---------------------------------------------|:---------------------------------------------|
-| $< 10 \text{ ppt}$   | $10-15 \text{ ppt}$        | $15-28 \text{ ppt}$                          | $> 28 \text{ ppt}$                           |
-| *Low energy demand*  | *negligible energy demand* | *high energy demand (freshwater-acclimated)* | *unsuitable (freshwater acclimated)*         |
-|                      |                            | *low energy demand (marine-acclimated)*      | *moderate energy demand (marine-aclimated)*  |
+| freshwater           | isotonic                   | brackish                                       | marine                                          |
+|:---------------------|:---------------------------|:-----------------------------------------------|:------------------------------------------------|
+| $< 10 \text{ ppt}$   | $10-15 \text{ ppt}$        | $15-28 \text{ ppt}$                            | $> 28 \text{ ppt}$                              |
+| *Low energy demand*  | *negligible energy demand* | *high energy demand (freshwater-acclimated)*   | *unsuitable (freshwater acclimated)*            |
+|                      |                            | *low energy demand (saltwater-aclimated)*      | *moderate energy demand (saltwater-aclimated)*  |
 
 
-#### Overall habitat
+## Overall habitat
 
-| category                         | Description                                                                                     |
-|:---------------------------------|:------------------------------------------------------------------------------------------------|
-| Optimal                          | all of: optimal growth (T), ion importing (S), function without impairment (DO)                 |
-| Unsuitable                       | any one of: unsuitable (T), ion-exporting (S), unsuitable (DO)                                  |
-| Sub-optimal (T)                  | positive growth (T), (S) and (DO) as in "optimal" category                                      |
-| Stressful (T)                    | no or negative growth (T), (S) and (DO) as in "optimal" category                                |
-| Sub-optimal (DO)                 | either suitable or limited by lack of oxygen (DO), (T) and (S) as in "optimal" category         |
-| Sub-optimal (S)                  | either ion neutral or induced ion exporting (S), (T) and (DO) as in "optimal" category          |
-| Sub-optimal (T, DO)              | (S) as in "optimal" category; (T) and (DO) as in "sub-optimal" categories                       |
-| Sub-optimal (T, S)               | (DO) as in "optimal" category; (T) and (S) as in "sub-optimal" categories                       |
-| Sub-optimal (DO, S)              | (T) as in "optimal" category; (S) and (DO) as in "sub-optimal" categories                       |
-| Stressful sub-optimal (T, DO)    | (S) as in "optimal" category; (T) as in "stressful" category; (DO) as in "sub-optimal" category |
-| Stressful sub-optimal (T, S)     | (DO) as in "optimal" category; (T) as in "stressful" category; (S) as in "sub-optimal" category |
-| Sub-optimal (T, S, DO)           | Suitable (T); (S) and (DO) as in "sub-optimal" categories                                       |
-| Stressful sub-optimal (T, S, DO) | Stressful (T); (S) and (DO) as in "sub-optimal" categories                                      |
+To assess the overall habitat quality of a region, the individual ratings are 
+into the 9 categories defined below.
 
-Habitat quality can additionally be assessed based on water depth, which has
+
+| category                                   | Description                                                                                                |
+|:-------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
+| Optimal                                    | optimal or positive growth (T); minimal impairment (DO); Low or negligible energy demand (S)               |
+| Growth limited                             | **no/negative growth (T)**;  minimal impairment (DO); Low or negligible energy demand (S)                  |
+| Impaired                                   | optimal or positive growth (T); **some or severe impairment (DO)**; Low or negligible energy demand (S)    |
+| Energy demanding                           | optimal or positive growth (T); minimal impairment (DO); **moderate or high energy demand (S)**            |
+| Growth limited, impaired                   | **no/negative growth (T)**; **some or severe impairment (DO)**; Low or negligible energy demand (S)        |
+| Growth limited, energy demanding           | **no/negative growth (T)**; minimal impairment (DO); **moderate or high energy demand (S)**                |
+| impaired, energy demanding                 | optimal or positive growth (T); **some or severe impairment (DO)**; **moderate or high energy demand (S)** |
+| Growth limited, impaired, energy demanding | **no/negative growth (T)**; **some or severe impairment (DO)**; **moderate or high energy demand (S)**     |
+| Unsuitable                                 | any one of: **unsuitable (T)**; **unsuitable (S)**; **unsuitable (DO)**                                    |
+
+
+## Depth Zone Definitions
+
+Habitat quality can also be assessed based on water depth, which has
 important implications for foraging, shelter and predation risk. The Water 
-Quality Parameter and Habitat Productivity Technical Group has additionally 
-defined a separate set of habitat categories that assess habitat in terms of 
-water depth.
+Quality Parameter and Habitat Productivity Technical Group has defined a 
+separate set of habitat categories that assess habitat in terms of water depth.
 
-| Category                  | Description                                                                       | Criteria                                                       |
-|:--------------------------|:----------------------------------------------------------------------------------|:---------------------------------------------------------------|
-| Littoral (Shallow/shoal)  | High prey availability, high avian predation risk, low aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} < 1\text{m}$            |
-| Surface Limnetic          | Low prey availability, high avian predation risk, high aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} \geq 1\text{m}$         |
+![Depth categories](depthdiagram.png)
+
+
+| Category                  | Description                                                                       | Criteria                                                         |
+|:--------------------------|:----------------------------------------------------------------------------------|:-----------------------------------------------------------------|
+| Littoral (Shallow/shoal)  | High prey availability, high avian predation risk, low aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} < 1\text{m}$              |
+| Surface Limnetic          | Low prey availability, high avian predation risk, high aquatic predation risk     | $depth < 1\text{m}$ and $\max{(depth)} \geq 1\text{m}$           |
 | Epibenthic                | High prey availability, low avian predation risk, moderate aquatic predation risk | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} \leq 5$ |
 | Subsurface Limnetic       | Low prey availability, low avian predation risk, moderate aquatic predation risk  | $1\text{m} \leq depth \leq 5\text{m}$ and $\max{(depth)} > 5$    |
-| Profundal                 | Low prey availability, no predation risk                                         | $depth > 5\text{m}$                                            |
-
+| Profundal                 | Low prey availability, no predation risk                                          | $depth > 5\text{m}$                                              |

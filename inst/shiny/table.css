@@ -25,8 +25,16 @@ table td {
 
 .selectize {
   line-height: 40px;
-  height: 40px;
   padding: 5px;
+}
+
+.selectize-input { 
+  line-height: 40px;
+  padding: 5px; 
+} 
+
+.selectize-dropdown { 
+  line-height: 40px; 
 }
 
 .selectize-dropdown-content {
