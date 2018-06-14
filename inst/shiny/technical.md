@@ -1,7 +1,7 @@
 ## Technical Details
 
 All data is processed using the 
-[`rremat` package](https://www.gtihbu.com/mkoohafkan/rremat) developed by the 
+[`rremat` package](https://www.github.com/mkoohafkan/rremat) developed by the 
 author. Please review the package documentation for specific information on 
 processing algorithms.
 
