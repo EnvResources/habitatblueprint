@@ -1,3 +1,8 @@
 ^\.travis\.yml$
 README.md
 MIT.txt
+^.*\.Rproj$
+^\.Rproj\.user$
+^C:\Repository\habitatblueprint\docs$
+^_pkgdown\.yml$
+^\.vs$
