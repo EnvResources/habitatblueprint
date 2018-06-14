@@ -1,7 +1,7 @@
 shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
   # explanation of project and interface
   tabPanel("Description", value = "info",
-    tabsetPanel("stuff",
+    tabsetPanel(id = "stuff", 
       tabPanel("welcome",
         includeMarkdown("welcome.md")
       ),
