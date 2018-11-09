@@ -1,8 +1,7 @@
 Package: habitatblueprint
 Title: Russian River Estuary Habitat BluePrint Browser
 Version: 0.1.0.9000
-Authors@R: c(
-    person("Michael", "Koohafkan", email = "koohafkan@ucdavis.edu", role = c("aut", "cre")))
+Authors@R: c(person("Michael", "Koohafkan", email = "koohafkan@ucdavis.edu", role = c("aut", "cre")))
 Description: Provides the Habitat Blueprint Browser shiny app.
 Depends:
     R (>= 3.2.0),
@@ -17,4 +16,4 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/mkoohafkan/habitatblueprint
 BugReports: https://github.com/mkoohafkan/habitatblueprint/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.1.1
