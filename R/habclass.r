@@ -110,3 +110,37 @@ classify_saltwater = function(ta, oa, sa){
       "growth limited, impaired, energy demanding", 
       "unsuitable"))
 }
+
+
+data(grids)
+habgrids = grids
+habgrids["ta.qual"] = classify_ta(habgrids$ta)
+habgrids["sa.qual"] = classify_sa(habgrids$sa)
+habgrids["oa.qual"] = classify_oa(habgrids$oa)
+habgrids["habitat.fwa"] = classify_freshwater(habgrids$ta.qual, habgrids$sa.qual, habgrids$oa.qual)
+habgrids["habitat.swa"] = classify_saltwater(habgrids$ta.qual, habgrids$sa.qual, habgrids$oa.qual)
+# add closure meta data
+data(closures)
+habgrids["code"] = "O"
+habgrids["days.since.closure"] = NA
+for(d in unique(habgrids$date)){
+  ind = which(d >= closures$start & d <= closures$end)
+  if(length(ind) > 0){
+    habgrids[habgrids$date == d, "code"] = as.character(closures[ind, "code"])
+    if(as.character(closures[ind, "code"]) == "C")
+      habgrids[habgrids$date == d, "days.since.closure"] = 
+        habgrids[habgrids$date == d, "date"] - 
+        closures$start[max(which(d >= closures$start))]
+  }
+}
+habgrids["code"] = factor(habgrids$code)
+# add ctd meta data
+data(ctdmeta)
+gridid = as.character(interaction(habgrids$date, habgrids$id))
+metaid = as.character(interaction(strftime(ctdmeta$start, format = "%Y-%m-%d", 
+  tz = "US/Pacific"), ctdmeta$id))
+for(i in seq(nrow(ctdmeta))){
+  habgrids[gridid == metaid[i], "numcasts"] = ctdmeta[i, "numcasts"]  
+}
+
+# usethis::use_data(habgrids, overwrite = TRUE)
