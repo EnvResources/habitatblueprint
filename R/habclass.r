@@ -2,14 +2,30 @@ make_hsd = function(expr, score){
   function(x) score[unlist(lapply(expr, eval, envir = environment()))]  
 }
 
-classify_ta = function(ta){
-  ta.windows = list(
-    "optimal growth" = expression(x >= 14 & x <= 18),
-    "positive growth" = expression(x < 14 | (x >= 18 & x <= 21)),
-    "negative/no growth" = expression(x > 21 & x <= 25),
-    "unsuitable" = expression(x > 25)
-  )
-  ta_hsd = make_hsd(ta.windows, names(ta.windows))
+# classifies the temperature
+classify_ta = function(ta, species){
+  # Creates classifications for coho temperatures
+  if(species == "coho") {
+    ta.windows = list(
+      "optimal growth" = expression(x >= 14 & x <= 18),
+      "positive growth" = expression(x < 14 | (x >= 18 & x <= 21)),
+      "negative/no growth" = expression(x > 21 & x <= 25),
+      "unsuitable" = expression(x > 25)
+    )
+  # Creates classifications for steelhead temperatures
+  } else if (species == "steelhead") {
+    ta.windows = list(
+      "optimal growth" = expression(x >= 14 & x <= 18),
+      "positive growth" = expression(x < 14 | (x >= 18 & x <= 21)),
+      "negative/no growth" = expression(x > 21 & x <= 25),
+      "unsuitable" = expression(x > 25)
+    )
+  } else {
+    # shows error if species isnt coho or steelhead
+    stop("Wrong species")
+  }
+  # calls make_hsd function
+  ta_hsd = make_hsd(ta.windows, names(ta.windows)) 
   factor(sapply(ta, ta_hsd), levels = names(ta.windows))
 }
 
@@ -111,10 +127,14 @@ classify_saltwater = function(ta, oa, sa){
       "unsuitable"))
 }
 
-
+# Open the grids dataset
 data(grids)
+# assign table to habgrids
 habgrids = grids
-habgrids["ta.qual"] = classify_ta(habgrids$ta)
+# create columns with classified values
+habgrids["ta.qual.coho"] = classify_ta(habgrids$ta, "coho") # classifies the temperature and enters it into a new column
+habgrids["ta.qual.steel"] = classify_ta(habgrids$ta, "steelhead") # classifies the temperature and enters it into a new column
+
 habgrids["sa.qual"] = classify_sa(habgrids$sa)
 habgrids["oa.qual"] = classify_oa(habgrids$oa)
 habgrids["habitat.fwa"] = classify_freshwater(habgrids$ta.qual, habgrids$sa.qual, habgrids$oa.qual)
