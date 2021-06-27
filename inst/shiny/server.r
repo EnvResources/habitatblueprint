@@ -3,6 +3,7 @@ data(inflows)
 data(tides)
 data(wll)
 data(habgrids)
+data(willowcreek)
 
 shinyServer(function(input, output, session){
 
@@ -503,5 +504,171 @@ landmarks = geom_label(data = landmarkdat, aes(x = dist, y = elev,
   observeEvent(input$perturb_reset, {
     reactivehab$grid = habgrids
   })
+
+########## Willow Creek ###################################################  
+
+########## side panel ##########
+
+  output$wc_period = renderUI({
+    dateRangeInput("wc_date", "Select dates", 
+      min = min(as.Date(willowcreek$date)), 
+      max = max(as.Date(willowcreek$date)) + 1,
+      start = min(as.Date(willowcreek$date)), 
+      end = max(as.Date(willowcreek$date)) + 1)
+  }) 
+
+ # prep for flow/tide/wll plots
+  wcrange = reactive(as.POSIXct(sort(input$wc_date), tz = "UTC"))
+  wcstart = reactive(wcrange()[1] - 3.5*86400)
+  wcend = reactive(wcrange()[2] + 3.5*86400)
+  wcinflow = reactive(filter(inflows, datetime >= wcstart(),
+    datetime <= wcend(), gauge == "russian river"))
+  wctide = reactive(filter(tides, datetime >= wcstart(),
+    datetime <= wcend()))
+  wcwll = reactive(filter(wll2, mtime >= wcstart(),
+    mtime <= wcend()))
+  wc.x.scale = reactive(scale_x_datetime("", limits = c(wcstart(), 
+    wcend())))
+  
+  
+  # plot the flows
+  output$wc_flows = renderPlot({
+    ggplot(wcinflow(), aes(x = datetime, y = flow)) + 
+    geom_line(color = "#377eb8") + ggtitle("Russian River Flow") +
+    ylab("inflow (m3/s)") + wc.x.scale()
+  })
+  
+  # plot the tides
+  output$wc_tides = renderPlot({
+    ggplot(wctide(), aes(x = datetime, y = height)) + 
+    geom_line(color = "#377eb8") + ggtitle("Point Reyes Tide Height") +
+    ylab("tide height (MLLW, m)") + wc.x.scale() 
+  })    
+  
+  # plot the water level
+  output$wc_wll = renderPlot({
+    ggplot(wcwll(), aes(x = mtime, y = wll)) + 
+    geom_line(color = "#377eb8") + ggtitle("Water Surface Elevation at Jenner") +
+    ylab("water surface elevation (NGVD29, m)") + wc.x.scale()
+  })
+
+
+########## main panel ##########
+
+  # get subset of willow creek data
+  wcselect = reactive({
+    daterange = willowcreek$time >= wcrange()[1] &
+      willowcreek$time <= wcrange()[2]
+    d = willowcreek[daterange,]
+    d["habitat"] = d[[input$wc_var]] 
+    d
+  })
+
+  wc.habitat.fills = reactive({
+    switch(input$wc_var,
+      "habitat.fwa" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "habitat.swa" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "ta.qual" = scale_fill_manual("Temperature quality", 
+        values = ta.colors, drop = FALSE),
+      "sa.qual" = scale_fill_manual("Salinity quality", 
+        values = sa.colors, drop = FALSE),
+      "oa.qual" = scale_fill_manual("Dissolved oxygen quality", 
+        values = oa.colors, drop = FALSE),
+      "ta" = scale_fill_distiller("Temperature\n", type = "div", 
+        palette = "RdYlBu", guide = "colourbar"),
+      "sa" = scale_fill_distiller("Salinity\n", type = "div", 
+        palette = "PRGn", guide = "colourbar"),
+      "oa" = scale_fill_distiller("Dissolved Oxygen\n", type = "div", 
+        palette = "BrBG", direction = 1, guide = "colourbar")
+    )
+  })
+
+  wc.habitat.colors = reactive({
+    switch(input$wc_var,
+      "habitat.fwa" = scale_color_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "habitat.swa" = scale_color_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "ta.qual" = scale_color_manual("Temperature quality", 
+        values = ta.colors, drop = FALSE),
+      "sa.qual" = scale_color_manual("Salinity quality", 
+        values = sa.colors, drop = FALSE),
+      "oa.qual" = scale_color_manual("Dissolved oxygen quality", 
+        values = oa.colors, drop = FALSE),
+      "ta" = scale_color_distiller("Temperature\n", type = "div", 
+        palette = "RdYlBu", guide = "colourbar"),
+      "sa" = scale_color_distiller("Salinity\n", type = "div", 
+        palette = "PRGn", guide = "colourbar"),
+      "oa" = scale_color_distiller("Dissolved Oxygen\n", type = "div", 
+        palette = "BrBG", direction = 1, guide = "colourbar")
+    )
+  })
+
+  wc.habitat.fill = reactive({
+    switch(input$wc_var,
+      "habitat.fwa" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "habitat.swa" = scale_fill_manual("Overall habitat quality", 
+        values = overall.colors, drop = FALSE),
+      "ta.qual" = scale_fill_manual("Temperature quality", 
+        values = ta.colors, drop = FALSE),
+      "sa.qual" = scale_fill_manual("Salinity quality", 
+        values = sa.colors, drop = FALSE),
+      "oa.qual" = scale_fill_manual("Dissolved oxygen quality", 
+        values = oa.colors, drop = FALSE),
+      "ta" = scale_color_distiller("Temperature\n", type = "div", 
+        palette = "RdYlBu", guide = "colourbar"),
+      "sa" = scale_color_distiller("Salinity\n", type = "div", 
+        palette = "PRGn", guide = "colourbar"),
+      "oa" = scale_color_distiller("Dissolved Oxygen\n", type = "div", 
+        palette = "BrBG", direction = 1, guide = "colourbar")
+    )
+  })
+
+
+  output$wc_overall = renderPlot({
+    if (input$wc_var %in% c("ta", "sa", "oa")) {
+      ggplot(wcselect(), aes(x = time,
+          y = volume.total, group = 1L, color = habitat)) +
+        geom_line() + wc.habitat.colors() +
+        scale_x_datetime("") +
+        theme(legend.position = "left") +
+        scale_y_continuous(name = "Volume (m3)", labels = comma)
+    } else {
+      wchab = gather(
+        spread(
+          select(wcselect(), time, volume.total, habitat),
+            habitat, volume.total, fill = 0
+        ),
+        habitat, volume.total, -time
+      )
+      ggplot(wchab, aes(x = time,
+          y = volume.total, fill = habitat)) +
+        geom_area() + wc.habitat.fill() +
+        scale_x_datetime("") +
+        theme(legend.position = "left") +
+        scale_y_continuous(name = "Volume (m3)", labels = comma)
+    }
+  })
+
+  output$wc_depth = renderPlot({
+    wcdepth = ungroup(summarize(group_by(gather(wcselect(), depth.zone, 
+      volume, volume.littoral, volume.limnetic, volume.epibenthic, 
+      volume.sublimnetic, volume.profundal), time, 
+      depth.zone), volume = sum(volume)))
+    wcdepth["depth.zone"] = factor(wcdepth$depth.zone, ordered = TRUE,
+      levels = c("volume.littoral", "volume.limnetic", "volume.epibenthic",
+        "volume.sublimnetic", "volume.profundal"), 
+      labels = c("littoral", "surface limnetic", "epibenthic", 
+        "subsurface limnetic", "profundal"))
+    ggplot(wcdepth, aes(x = time, y = volume, fill = depth.zone)) +
+      geom_area(position = "stack") + scale_x_datetime("") +
+      scale_fill_manual("", values = depth.colors, drop = FALSE) +
+      theme(legend.position = "left") +
+      scale_y_continuous(name = "Volume (m3)", labels = comma)
+  })
+
 
 })
