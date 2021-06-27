@@ -112,5 +112,28 @@ shinyUI(navbarPage("Habitat Blueprint Browser", id = "navbar",
       )  
     )
   ),
+  tabPanel("Willow Creek", value = "willowcreek",
+    sidebarLayout(
+      sidebarPanel(
+        uiOutput("wc_period"),
+        plotOutput("wc_flows"),
+        plotOutput("wc_tides"),
+        plotOutput("wc_wll")
+      ),
+      mainPanel(
+        h3(selectInput("wc_var", NULL, 
+            choices = c(
+              "Overall Habitat (freshwater-acclimated)" = "habitat.fwa", 
+              "Overall Habitat (saltwater-acclimated)" = "habitat.swa",
+              "Temperature Habitat" = "ta.qual", 
+              "Salinity Habitat"  = "sa.qual", 
+              "Dissolved Oxygen Habitat"  = "oa.qual",
+              "Temperature (raw)" = "ta", "Salinity (raw)" = "sa",
+              "Dissolved Oxygen (raw)" = "oa"), width = "60%")),
+        plotOutput("wc_overall"),
+        plotOutput("wc_depth")
+      )
+    )  
+  ),
   tabPanel("Quit", value = "stop")
 ))
